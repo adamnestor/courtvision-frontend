@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { Input } from './Input';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext.types";
+import { Input } from "./Input";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       await login(formData.email, formData.password);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
       const error = err as Error;
-      setError(error.message || 'Invalid email or password');
+      setError(error.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }
@@ -30,8 +30,12 @@ export const LoginForm = () => {
   return (
     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Welcome to CourtVision</h1>
-        <p className="text-sm text-muted-foreground">Enter your credentials to sign in</p>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Welcome to CourtVision
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Enter your credentials to sign in
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -46,7 +50,9 @@ export const LoginForm = () => {
           label="Password"
           type="password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
           required
         />
         {error && (
@@ -65,13 +71,15 @@ export const LoginForm = () => {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
             </>
           ) : (
-            'Sign In'
+            "Sign In"
           )}
         </button>
-        
+
         <div className="text-center text-sm">
           <span className="text-muted-foreground">Don't have an account? </span>
-          <a href="/register" className="text-black hover:underline">Register</a>
+          <a href="/register" className="text-black hover:underline">
+            Register
+          </a>
         </div>
       </form>
     </div>

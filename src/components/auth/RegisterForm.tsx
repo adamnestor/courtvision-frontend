@@ -1,31 +1,35 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { Input } from './Input';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext.types";
+import { Input } from "./Input";
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      await register(formData.email, formData.password, formData.confirmPassword);
-      navigate('/login');
+      await register(
+        formData.email,
+        formData.password,
+        formData.confirmPassword
+      );
+      navigate("/login");
     } catch (err) {
       const error = err as Error;
-      setError(error.message || 'Registration failed. Please try again.');
+      setError(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -34,8 +38,12 @@ export const RegisterForm = () => {
   return (
     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
-        <p className="text-sm text-muted-foreground">Enter your details to register</p>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Create an account
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Enter your details to register
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,15 +58,24 @@ export const RegisterForm = () => {
           label="Password"
           type="password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
           required
         />
         <Input
           label="Confirm Password"
           type="password"
           value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-          error={formData.confirmPassword && formData.password !== formData.confirmPassword ? 'Passwords do not match' : ''}
+          onChange={(e) =>
+            setFormData({ ...formData, confirmPassword: e.target.value })
+          }
+          error={
+            formData.confirmPassword &&
+            formData.password !== formData.confirmPassword
+              ? "Passwords do not match"
+              : ""
+          }
           required
         />
         {error && (
@@ -77,13 +94,17 @@ export const RegisterForm = () => {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
             </>
           ) : (
-            'Register'
+            "Register"
           )}
         </button>
-        
+
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Already have an account? </span>
-          <a href="/login" className="text-black hover:underline">Login</a>
+          <span className="text-muted-foreground">
+            Already have an account?{" "}
+          </span>
+          <a href="/login" className="text-black hover:underline">
+            Login
+          </a>
         </div>
       </form>
     </div>
