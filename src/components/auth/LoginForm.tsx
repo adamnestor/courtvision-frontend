@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
@@ -6,12 +6,17 @@ import { Input } from "./Input";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
 
-  // Rest of your component stays exactly the same
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === "ADMIN" ? "/admin/dashboard" : "/dashboard");
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -19,7 +24,6 @@ export const LoginForm = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/dashboard");
     } catch (err) {
       const error = err as Error;
       setError(error.message || "Invalid email or password");
