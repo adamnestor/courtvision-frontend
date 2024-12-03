@@ -1,14 +1,25 @@
-import { useState } from "react";
 import { TimePeriodSelect } from "./TimePeriodSelect";
 import { CategorySelect } from "./CategorySelect";
 import { ThresholdSelect } from "./ThresholdSelect";
 import { Category, TimePeriod, Threshold } from "../../../types/dashboard";
 
-export const FilterBar = () => {
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>("L10");
-  const [category, setCategory] = useState<Category>("ALL");
-  const [threshold, setThreshold] = useState<Threshold | null>(null);
+interface FilterBarProps {
+  timePeriod: TimePeriod;
+  category: Category;
+  threshold: Threshold | null;
+  onTimePeriodChange: (value: TimePeriod) => void;
+  onCategoryChange: (value: Category) => void;
+  onThresholdChange: (value: Threshold | null) => void;
+}
 
+export const FilterBar = ({
+  timePeriod,
+  category,
+  threshold,
+  onTimePeriodChange,
+  onCategoryChange,
+  onThresholdChange,
+}: FilterBarProps) => {
   const thresholdOptions = {
     POINTS: [10, 15, 20, 25],
     ASSISTS: [2, 4, 6, 8],
@@ -18,12 +29,12 @@ export const FilterBar = () => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
       <div className="flex flex-wrap gap-4">
-        <TimePeriodSelect value={timePeriod} onChange={setTimePeriod} />
-        <CategorySelect value={category} onChange={setCategory} />
+        <TimePeriodSelect value={timePeriod} onChange={onTimePeriodChange} />
+        <CategorySelect value={category} onChange={onCategoryChange} />
         {category !== "ALL" && (
           <ThresholdSelect
             value={threshold}
-            onChange={setThreshold}
+            onChange={onThresholdChange}
             options={
               thresholdOptions[category as keyof typeof thresholdOptions]
             }
