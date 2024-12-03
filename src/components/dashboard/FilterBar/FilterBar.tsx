@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { TimePeriodSelect } from "./TimePeriodSelect";
 import { CategorySelect } from "./CategorySelect";
 import { ThresholdSelect } from "./ThresholdSelect";
