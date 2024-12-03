@@ -1,25 +1,19 @@
 import { useAuth } from "../../hooks/useAuth";
+import { DashboardHeader } from "./DashboardHeader";
+import { FilterBar } from "./FilterBar";
+import { StatsTable } from "./StatsTable";
 
 export const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            CourtVision Dashboard
-          </h1>
-          <button
-            onClick={logout}
-            className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800"
-          >
-            Logout
-          </button>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-gray-600">Welcome, {user?.email}</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <DashboardHeader />
+        <main className="mt-8 space-y-6">
+          <FilterBar />
+          <StatsTable />
+        </main>
       </div>
     </div>
   );
