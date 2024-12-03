@@ -2,8 +2,10 @@ import { RegisterForm } from "../components/auth/RegisterForm";
 
 export const RegisterPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <RegisterForm />
+    <div className="min-h-screen w-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md mx-auto bg-white p-8 rounded-lg shadow-sm">
+        <RegisterForm />
+      </div>
     </div>
   );
 };

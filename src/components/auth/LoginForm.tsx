@@ -33,8 +33,8 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-      <div className="flex flex-col space-y-2 text-center">
+    <div className="w-full">
+      <div className="w-full text-center mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">
           Welcome to CourtVision
         </h1>
@@ -43,7 +43,7 @@ export const LoginForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="w-full space-y-4">
         <Input
           label="Email"
           type="email"
