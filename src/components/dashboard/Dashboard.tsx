@@ -1,7 +1,7 @@
 import { useAuth } from "../../hooks/useAuth";
 import { DashboardHeader } from "./DashboardHeader";
 import { FilterBar } from "./FilterBar";
-import { StatsTable } from "./StatsTable";
+import { StatsTable } from "./StatsTable/StatsTable";
 
 export const Dashboard = () => {
   const { user } = useAuth();
