@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../../services/api";
 import { StatsRow } from "../../../types/dashboard";
 import { StatsTableRow } from "./StatsTableRow";
 import { StatsTableHeader } from "./StatsTableHeader";
 import { Category, TimePeriod, Threshold } from "../../../types/dashboard";
 import { ApiResponse } from "../../../types/api";
+import { authService } from "../../../services/authService";
 
 interface StatsTableProps {
   timePeriod: TimePeriod;
@@ -22,12 +23,14 @@ export const StatsTable = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log("Current user:", authService.getCurrentUser());
+
     const fetchStats = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get<ApiResponse<StatsRow[]>>(
-          "http://localhost:8080/api/dashboard/stats",
+        const response = await api.get<ApiResponse<StatsRow[]>>(
+          "/dashboard/stats",
           {
             params: {
               timePeriod,
