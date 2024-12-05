@@ -11,8 +11,22 @@ export const Dashboard = () => {
   const [category, setCategory] = useState<Category>("ALL");
   const [threshold, setThreshold] = useState<Threshold | null>(null);
 
+  const handleCategoryChange = (newCategory: Category) => {
+    setCategory(newCategory);
+    // Set default threshold based on category
+    if (newCategory === "POINTS") {
+      setThreshold(15);
+    } else if (newCategory === "ASSISTS") {
+      setThreshold(4);
+    } else if (newCategory === "REBOUNDS") {
+      setThreshold(8);
+    } else {
+      setThreshold(null);
+    }
+  };
+
   if (!user) {
-    return <div>Loading...</div>; // or redirect to login
+    return <div>Loading...</div>;
   }
 
   return (
@@ -25,7 +39,7 @@ export const Dashboard = () => {
             category={category}
             threshold={threshold}
             onTimePeriodChange={setTimePeriod}
-            onCategoryChange={setCategory}
+            onCategoryChange={handleCategoryChange}
             onThresholdChange={setThreshold}
           />
           <StatsTable
