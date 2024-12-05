@@ -10,6 +10,7 @@ interface FilterBarProps {
   onTimePeriodChange: (value: TimePeriod) => void;
   onCategoryChange: (value: Category) => void;
   onThresholdChange: (value: Threshold | null) => void;
+  availableCategories?: Category[]; // Added this prop
 }
 
 export const FilterBar = ({
@@ -19,6 +20,7 @@ export const FilterBar = ({
   onTimePeriodChange,
   onCategoryChange,
   onThresholdChange,
+  availableCategories = ["ALL", "POINTS", "ASSISTS", "REBOUNDS"], // Default value
 }: FilterBarProps) => {
   const thresholdOptions = {
     POINTS: [10, 15, 20, 25],
@@ -30,7 +32,11 @@ export const FilterBar = ({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
       <div className="flex flex-wrap gap-4">
         <TimePeriodSelect value={timePeriod} onChange={onTimePeriodChange} />
-        <CategorySelect value={category} onChange={onCategoryChange} />
+        <CategorySelect
+          value={category}
+          onChange={onCategoryChange}
+          availableCategories={availableCategories}
+        />
         {category !== "ALL" && (
           <ThresholdSelect
             value={threshold}
