@@ -10,7 +10,7 @@ interface FilterBarProps {
   onTimePeriodChange: (value: TimePeriod) => void;
   onCategoryChange: (value: Category) => void;
   onThresholdChange: (value: Threshold | null) => void;
-  availableCategories?: Category[]; // Added this prop
+  availableCategories?: Category[];
 }
 
 export const FilterBar = ({
@@ -20,7 +20,7 @@ export const FilterBar = ({
   onTimePeriodChange,
   onCategoryChange,
   onThresholdChange,
-  availableCategories = ["ALL", "POINTS", "ASSISTS", "REBOUNDS"], // Default value
+  availableCategories = ["ALL", "POINTS", "ASSISTS", "REBOUNDS"],
 }: FilterBarProps) => {
   const thresholdOptions = {
     POINTS: [10, 15, 20, 25],

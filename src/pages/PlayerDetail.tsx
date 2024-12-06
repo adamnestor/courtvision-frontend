@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { PlayerDetailHeader } from "../components/player/PlayerDetailHeader";
 import { PlayerDetailChart } from "../components/player/PlayerDetailChart";
 import { FilterBar } from "../components/dashboard";
@@ -7,10 +7,19 @@ import { usePlayerStats } from "../hooks/usePlayerStats";
 import { Category, TimePeriod, Threshold } from "../types/dashboard";
 
 export const PlayerDetail = () => {
-  const { playerId } = useParams<{ playerId: string }>();
+  const { playerId } = useParams();
+  const location = useLocation();
+  const { initialCategory = "POINTS", initialThreshold = 20 } =
+    (location.state as {
+      initialCategory: Category;
+      initialThreshold: number;
+    }) || {};
+
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("L10");
-  const [category, setCategory] = useState<Category>("POINTS");
-  const [threshold, setThreshold] = useState<Threshold | null>(20);
+  const [category, setCategory] = useState<Category>(initialCategory);
+  const [threshold, setThreshold] = useState<Threshold | null>(
+    initialThreshold
+  );
 
   const handleThresholdChange = (value: Threshold | null) => {
     setThreshold(value);

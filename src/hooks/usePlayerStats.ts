@@ -12,7 +12,8 @@ export const usePlayerStats = (
   return useQuery<PlayerDetailStats>({
     queryKey: ["playerStats", playerId, timePeriod, category, threshold],
     queryFn: async () => {
-      const response = await api.get(`/api/players/${playerId}/stats`, {
+      console.log("Request params:", { timePeriod, category, threshold });
+      const response = await api.get(`/players/${playerId}/stats`, {
         params: {
           timePeriod,
           category,

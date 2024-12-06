@@ -9,7 +9,13 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/player/${stat.playerId}`);
+    const [category, threshold] = stat.statLine.split(" ");
+    navigate(`/player/${stat.playerId}`, {
+      state: {
+        initialCategory: category.toUpperCase(),
+        initialThreshold: parseInt(threshold),
+      },
+    });
   };
 
   return (

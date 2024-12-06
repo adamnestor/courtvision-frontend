@@ -5,6 +5,10 @@ interface PlayerDetailChartProps {
 }
 
 export const PlayerDetailChart = ({ stats }: PlayerDetailChartProps) => {
+  console.log("Chart stats:", stats);
+  console.log("Games:", stats.games);
+  console.log("Sample game:", stats.games[0]);
+
   const { games, metrics, threshold } = stats;
   const maxDisplayValue = Math.ceil(metrics.maxValue * 1.1); // Add 10% padding
 
