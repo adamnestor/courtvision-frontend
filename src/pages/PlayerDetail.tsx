@@ -17,11 +17,29 @@ export const PlayerDetail = () => {
       initialThreshold: number;
     }) || {};
 
+  const getDefaultThreshold = (category: Category): number => {
+    switch (category) {
+      case "POINTS":
+        return 15;
+      case "ASSISTS":
+        return 4;
+      case "REBOUNDS":
+        return 8;
+      default:
+        return 15;
+    }
+  };
+
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("L10");
   const [category, setCategory] = useState<Category>(initialCategory);
   const [threshold, setThreshold] = useState<Threshold | null>(
     initialThreshold
   );
+
+  const handleCategoryChange = (newCategory: Category) => {
+    setCategory(newCategory);
+    setThreshold(getDefaultThreshold(newCategory));
+  };
 
   const handleThresholdChange = (value: Threshold | null) => {
     setThreshold(value);
@@ -35,7 +53,7 @@ export const PlayerDetail = () => {
     Number(playerId),
     timePeriod,
     category,
-    threshold ?? 20 // Provide default value if null
+    threshold ?? getDefaultThreshold(category) // Use category-specific default
   );
 
   if (isLoading) {
@@ -85,11 +103,16 @@ export const PlayerDetail = () => {
             category={category}
             threshold={threshold}
             onTimePeriodChange={setTimePeriod}
-            onCategoryChange={setCategory}
+            onCategoryChange={handleCategoryChange}
             onThresholdChange={handleThresholdChange}
             availableCategories={["POINTS", "ASSISTS", "REBOUNDS"]}
           />
-          <PlayerDetailChart stats={stats} />
+          <PlayerDetailChart
+            stats={stats}
+            statType={
+              category.toLowerCase() as "points" | "assists" | "rebounds"
+            }
+          />
         </main>
       </div>
     </div>
