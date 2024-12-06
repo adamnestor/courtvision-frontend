@@ -2,37 +2,61 @@ import { PlayerDetailStats } from "../../types/player";
 
 interface PlayerDetailChartProps {
   stats: PlayerDetailStats;
+  statType: "points" | "assists" | "rebounds";
 }
 
-export const PlayerDetailChart = ({ stats }: PlayerDetailChartProps) => {
-  console.log("Chart stats:", stats);
-  console.log("Games:", stats.games);
-  console.log("Sample game:", stats.games[0]);
+export const PlayerDetailChart = ({
+  stats,
+  statType,
+}: PlayerDetailChartProps) => {
+  const { games, threshold } = stats;
 
-  const { games, metrics, threshold } = stats;
-  const maxDisplayValue = Math.ceil(metrics.maxValue * 1.1);
+  const getNextInterval = (value: number, stepSize: number) => {
+    return Math.ceil(value / stepSize) * stepSize;
+  };
 
-  console.log(
-    "Bar heights:",
-    games.map((game) => {
-      const height = (game.selectedStatValue / maxDisplayValue) * 100;
-      return {
-        opponent: game.opponent,
-        value: game.selectedStatValue,
-        calculatedHeight: height,
-      };
-    })
+  // First get the stepSize based on stat type
+  const stepSize = statType === "points" ? 5 : 2;
+
+  // Get the highest value needed (max of: highest stat value or threshold)
+  const highestValue = Math.max(
+    ...games.map((g) => g.selectedStatValue),
+    threshold
   );
+
+  // Get the next interval above that value
+  const maxDisplayValue = getNextInterval(highestValue, stepSize);
+
+  const getYAxisValues = (maxValue: number, stepSize: number) => {
+    const values = [];
+    for (let value = 0; value <= maxValue; value += stepSize) {
+      values.push({
+        value,
+        position: (value / maxValue) * 100,
+      });
+    }
+    return values;
+  };
+
+  const thresholdHeight = (threshold / maxDisplayValue) * 100;
+  const yAxisValues = getYAxisValues(maxDisplayValue, stepSize);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       {/* Chart Container */}
-      <div className="relative h-80">
+      <div className="relative w-full" style={{ height: "320px" }}>
         {/* Y-axis */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-sm text-gray-500">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="text-right pr-2">
-              {Math.round(maxDisplayValue - (i * maxDisplayValue) / 4)}
+        <div className="absolute left-0 top-0 bottom-0 w-12">
+          {yAxisValues.map(({ value, position }, i) => (
+            <div
+              key={i}
+              className="absolute right-0 text-sm text-gray-500 pr-2"
+              style={{
+                bottom: `${position}%`,
+                transform: "translateY(50%)",
+              }}
+            >
+              {value}
             </div>
           ))}
         </div>
@@ -49,12 +73,14 @@ export const PlayerDetailChart = ({ stats }: PlayerDetailChartProps) => {
             return (
               <div
                 key={game.gameId}
-                className="flex-1 flex flex-col items-center justify-end h-64 relative min-w-[30px]"
+                className="flex-1 flex flex-col items-center justify-end relative min-w-[30px] h-full"
               >
                 {game.selectedStatValue > 0 && (
                   <div
                     className={`w-full max-w-24 min-h-[2px] ${
-                      game.metThreshold ? "bg-green-500" : "bg-red-500"
+                      game.selectedStatValue >= threshold
+                        ? "bg-green-500"
+                        : "bg-red-500"
                     }`}
                     style={{ height: `${height}%` }}
                   />
@@ -81,7 +107,7 @@ export const PlayerDetailChart = ({ stats }: PlayerDetailChartProps) => {
         <div
           className="absolute left-12 right-0 border-t-2 border-red-500 border-dashed pointer-events-none"
           style={{
-            bottom: `${(threshold / maxDisplayValue) * 100}%`,
+            bottom: `${thresholdHeight}%`,
           }}
         >
           <span className="absolute right-0 -top-4 text-xs text-red-500">
