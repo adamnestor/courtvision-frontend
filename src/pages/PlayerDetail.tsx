@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { PlayerDetailHeader } from "../components/player/PlayerDetailHeader";
 import { PlayerDetailChart } from "../components/player/PlayerDetailChart";
 import { FilterBar } from "../components/dashboard";
@@ -9,6 +10,7 @@ import { Category, TimePeriod, Threshold } from "../types/dashboard";
 export const PlayerDetail = () => {
   const { playerId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { initialCategory = "POINTS", initialThreshold = 20 } =
     (location.state as {
       initialCategory: Category;
@@ -67,6 +69,15 @@ export const PlayerDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 mb-6 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Dashboard</span>
+        </button>
+
         <PlayerDetailHeader stats={stats} />
         <main className="mt-8 space-y-6">
           <FilterBar
