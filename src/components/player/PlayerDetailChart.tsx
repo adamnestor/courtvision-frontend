@@ -46,7 +46,7 @@ export const PlayerDetailChart = ({
       {/* Chart Container */}
       <div className="relative w-full" style={{ height: "320px" }}>
         {/* Y-axis */}
-        <div className="absolute left-0 top-0 bottom-0 w-12">
+        <div className="absolute left-0 top-0 bottom-0 w-12 bg-white dark:bg-gray-800 z-10">
           {yAxisValues.map(({ value, position }, i) => (
             <div
               key={i}
@@ -61,58 +61,66 @@ export const PlayerDetailChart = ({
           ))}
         </div>
 
-        {/* Bars */}
-        <div className="ml-12 h-full flex items-end gap-1">
-          {[...games].reverse().map((game) => {
-            const height = (game.selectedStatValue / maxDisplayValue) * 100;
-            const date = new Date(game.gameDate).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            });
+        {/* Scrollable Container */}
+        <div className="absolute left-12 right-0 top-0 bottom-0 overflow-x-auto">
+          {/* Bars Container - Set minimum width based on number of games */}
+          <div
+            className="h-full flex items-end gap-1 relative"
+            style={{
+              minWidth: `${Math.max(games.length * 40, 100)}px`,
+            }}
+          >
+            {[...games].reverse().map((game) => {
+              const height = (game.selectedStatValue / maxDisplayValue) * 100;
+              const date = new Date(game.gameDate).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              });
 
-            return (
-              <div
-                key={game.gameId}
-                className="flex-1 flex flex-col items-center justify-end relative min-w-[30px] h-full"
-              >
-                {game.selectedStatValue > 0 && (
-                  <div
-                    className={`w-full max-w-24 min-h-[2px] ${
-                      game.selectedStatValue >= threshold
-                        ? "bg-green-500"
-                        : "bg-red-500"
-                    }`}
-                    style={{ height: `${height}%` }}
-                  />
-                )}
+              return (
                 <div
-                  className={`absolute bottom-0 left-1/2 -translate-x-1/2 text-[10px] font-semibold whitespace-nowrap px-1 flex flex-col items-center ${
-                    game.selectedStatValue > 0
-                      ? "text-white dark:text-white"
-                      : "text-gray-700 dark:text-white"
-                  }`}
+                  key={game.gameId}
+                  className="flex-1 flex flex-col items-center justify-end relative min-w-[30px] h-full"
                 >
-                  <span>
-                    {!game.isHome && "@"}
-                    {game.opponent}
-                  </span>
-                  <span className="text-[8px] opacity-75">{date}</span>
+                  {game.selectedStatValue > 0 && (
+                    <div
+                      className={`w-full max-w-24 min-h-[2px] ${
+                        game.selectedStatValue >= threshold
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ height: `${height}%` }}
+                    />
+                  )}
+                  <div
+                    className={`absolute bottom-0 left-1/2 -translate-x-1/2 text-[10px] font-semibold whitespace-nowrap px-1 flex flex-col items-center ${
+                      game.selectedStatValue > 0
+                        ? "text-white dark:text-white"
+                        : "text-gray-700 dark:text-white"
+                    }`}
+                  >
+                    <span>
+                      {!game.isHome && "@"}
+                      {game.opponent}
+                    </span>
+                    <span className="text-[8px] opacity-75">{date}</span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
 
-        {/* Threshold Line */}
-        <div
-          className="absolute left-12 right-0 border-t-2 border-red-500 border-dashed pointer-events-none"
-          style={{
-            bottom: `${thresholdHeight}%`,
-          }}
-        >
-          <span className="absolute right-0 -top-4 text-xs text-red-500">
-            {threshold}+
-          </span>
+            {/* Threshold Line */}
+            <div
+              className="absolute left-0 right-0 border-t-2 border-red-500 border-dashed pointer-events-none"
+              style={{
+                bottom: `${thresholdHeight}%`,
+              }}
+            >
+              <span className="absolute right-0 -top-4 text-xs text-red-500">
+                {threshold}+
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
