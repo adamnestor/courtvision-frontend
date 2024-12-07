@@ -45,4 +45,13 @@
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
   }
+
+  html,
+  body {
+    @apply w-full h-full m-0 p-0;
+  }
+
+  body > div#root {
+    @apply w-full h-full;
+  }
 }
