@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { ParlayBuilderPanel } from "../parlay/ParlayBuilderPanel";
 
 export const ProtectedRoute = () => {
   const { user, isAuthenticated } = useAuth();
@@ -10,5 +11,9 @@ export const ProtectedRoute = () => {
   }
 
   // Render child routes
-  return <Outlet />;
+  return;
+  <>
+    <Outlet />;
+    <ParlayBuilderPanel />
+  </>;
 };
