@@ -3,6 +3,8 @@ import { PlusCircle, ListPlus } from "lucide-react";
 import { useParlayBuilder } from "../../context/ParlayBuilderContext";
 import { v4 as uuidv4 } from "uuid";
 import { PickCategory } from "../../types/parlay";
+import { toast } from "react-hot-toast";
+import { createSinglePick } from "../../services/api";
 
 interface PlayerDetailHeaderProps {
   stats: PlayerDetailStats;
@@ -24,6 +26,28 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
       hitRate: summary.hitRate,
       timestamp: new Date().toISOString(),
     });
+  };
+
+  const handleSinglePick = async () => {
+    try {
+      const response = await createSinglePick({
+        playerId: player.playerId,
+        category: summary.category as PickCategory,
+        threshold: summary.threshold,
+        hitRateAtPick: summary.hitRate,
+        isParlay: false,
+      });
+
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
+      toast.success("Pick saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save pick");
+      console.error("Error saving pick:", error);
+    }
   };
 
   return (
@@ -63,6 +87,7 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
             <button
               title="Save Single Pick"
               className="hover:text-green-600 transition-colors"
+              onClick={handleSinglePick}
             >
               <PlusCircle size={24} />
             </button>

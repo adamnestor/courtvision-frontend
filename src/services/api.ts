@@ -1,5 +1,6 @@
 import axios from "axios";
 import { authService } from "./authService";
+import { ApiResponse, CreatePickRequest, PickResponse } from "../types/api";
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
@@ -23,5 +24,15 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export const createSinglePick = async (
+  data: CreatePickRequest
+): Promise<ApiResponse<PickResponse>> => {
+  const response = await api.post<ApiResponse<PickResponse>>("/picks", {
+    ...data,
+    isParlay: false,
+  });
+  return response.data;
+};
 
 export default api;

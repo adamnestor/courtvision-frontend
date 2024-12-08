@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { PlusCircle, ListPlus } from "lucide-react";
 import { useParlayBuilder } from "../../../context/ParlayBuilderContext";
 import { v4 as uuidv4 } from "uuid";
+import { PickCategory } from "../../../types/parlay";
+import { toast } from "react-hot-toast";
+import { createSinglePick } from "../../../services/api";
 
 interface StatsTableRowProps {
   stat: StatsRow;
@@ -13,7 +16,6 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
   const { addPick } = useParlayBuilder();
 
   const handleRowClick = (e: React.MouseEvent) => {
-    // Prevent navigation when clicking buttons
     if ((e.target as HTMLElement).closest("button")) {
       e.stopPropagation();
       return;
@@ -29,7 +31,7 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
   };
 
   const handleAddToParlay = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation();
     const [category, thresholdStr] = stat.statLine.split(" ");
 
     addPick({
@@ -38,11 +40,36 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
       playerName: stat.playerName,
       team: stat.team,
       opponent: stat.opponent,
-      category: category.toUpperCase() as "POINTS" | "ASSISTS" | "REBOUNDS",
+      category: category.toUpperCase() as PickCategory,
       threshold: parseInt(thresholdStr),
       hitRate: stat.hitRate,
       timestamp: new Date().toISOString(),
     });
+  };
+
+  const handleSinglePick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const [category, thresholdStr] = stat.statLine.split(" ");
+
+    try {
+      const response = await createSinglePick({
+        playerId: stat.playerId,
+        category: category.toUpperCase() as PickCategory,
+        threshold: parseInt(thresholdStr),
+        hitRateAtPick: stat.hitRate,
+        isParlay: false,
+      });
+
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
+      toast.success("Pick saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save pick");
+      console.error("Error saving pick:", error);
+    }
   };
 
   return (
@@ -78,7 +105,7 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
           <button
             title="Save Single Pick"
             className="hover:text-green-600 transition-colors"
-            onClick={(e) => e.stopPropagation()} // Add single pick functionality later
+            onClick={handleSinglePick}
           >
             <PlusCircle size={18} />
           </button>
