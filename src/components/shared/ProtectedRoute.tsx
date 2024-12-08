@@ -11,9 +11,10 @@ export const ProtectedRoute = () => {
   }
 
   // Render child routes
-  return;
-  <>
-    <Outlet />;
-    <ParlayBuilderPanel />
-  </>;
+  return (
+    <>
+      <Outlet />;
+      <ParlayBuilderPanel />
+    </>
+  );
 };

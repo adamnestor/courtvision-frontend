@@ -1,5 +1,8 @@
 import { PlayerDetailStats } from "../../types/player";
 import { PlusCircle, ListPlus } from "lucide-react";
+import { useParlayBuilder } from "../../context/ParlayBuilderContext";
+import { v4 as uuidv4 } from "uuid";
+import { PickCategory } from "../../types/parlay";
 
 interface PlayerDetailHeaderProps {
   stats: PlayerDetailStats;
@@ -7,6 +10,21 @@ interface PlayerDetailHeaderProps {
 
 export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
   const { player, summary } = stats;
+  const { addPick } = useParlayBuilder();
+
+  const handleAddToParlay = () => {
+    addPick({
+      id: uuidv4(),
+      playerId: player.playerId,
+      playerName: `${player.firstName} ${player.lastName}`,
+      team: player.teamAbbreviation,
+      opponent: stats.games[0]?.opponent || "", // Get latest opponent
+      category: summary.category as PickCategory,
+      threshold: summary.threshold,
+      hitRate: summary.hitRate,
+      timestamp: new Date().toISOString(),
+    });
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -51,6 +69,7 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
             <button
               title="Add to Parlay"
               className="hover:text-blue-600 transition-colors"
+              onClick={handleAddToParlay}
             >
               <ListPlus size={24} />
             </button>

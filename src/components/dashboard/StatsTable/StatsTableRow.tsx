@@ -1,6 +1,8 @@
 import { StatsRow } from "../../../types/dashboard";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle, ListPlus } from "lucide-react";
+import { useParlayBuilder } from "../../../context/ParlayBuilderContext";
+import { v4 as uuidv4 } from "uuid";
 
 interface StatsTableRowProps {
   stat: StatsRow;
@@ -8,8 +10,15 @@ interface StatsTableRowProps {
 
 export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
   const navigate = useNavigate();
+  const { addPick } = useParlayBuilder();
 
-  const handleClick = () => {
+  const handleRowClick = (e: React.MouseEvent) => {
+    // Prevent navigation when clicking buttons
+    if ((e.target as HTMLElement).closest("button")) {
+      e.stopPropagation();
+      return;
+    }
+
     const [category, threshold] = stat.statLine.split(" ");
     navigate(`/player/${stat.playerId}`, {
       state: {
@@ -19,10 +28,27 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
     });
   };
 
+  const handleAddToParlay = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click
+    const [category, thresholdStr] = stat.statLine.split(" ");
+
+    addPick({
+      id: uuidv4(),
+      playerId: stat.playerId,
+      playerName: stat.playerName,
+      team: stat.team,
+      opponent: stat.opponent,
+      category: category.toUpperCase() as "POINTS" | "ASSISTS" | "REBOUNDS",
+      threshold: parseInt(thresholdStr),
+      hitRate: stat.hitRate,
+      timestamp: new Date().toISOString(),
+    });
+  };
+
   return (
     <div
       className="px-6 py-4 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer"
-      onClick={handleClick}
+      onClick={handleRowClick}
     >
       <div
         className="grid items-center gap-4"
@@ -52,12 +78,14 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
           <button
             title="Save Single Pick"
             className="hover:text-green-600 transition-colors"
+            onClick={(e) => e.stopPropagation()} // Add single pick functionality later
           >
             <PlusCircle size={18} />
           </button>
           <button
             title="Add to Parlay"
             className="hover:text-blue-600 transition-colors"
+            onClick={handleAddToParlay}
           >
             <ListPlus size={18} />
           </button>
