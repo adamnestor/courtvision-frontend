@@ -1,6 +1,7 @@
 import axios from "axios";
 import { authService } from "./authService";
 import { ApiResponse, CreatePickRequest, PickResponse } from "../types/api";
+import { UserPickDTO } from "../types/picks";
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
@@ -32,6 +33,21 @@ export const createSinglePick = async (
     ...data,
     isParlay: false,
   });
+  return response.data;
+};
+
+export const getUserPicks = async (): Promise<ApiResponse<UserPickDTO[]>> => {
+  const response = await api.get<ApiResponse<UserPickDTO[]>>("/picks");
+  return response.data;
+};
+
+export const deletePick = async (id: number): Promise<ApiResponse<void>> => {
+  const response = await api.delete<ApiResponse<void>>(`/picks/${id}`);
+  return response.data;
+};
+
+export const deleteParlay = async (id: number): Promise<ApiResponse<void>> => {
+  const response = await api.delete<ApiResponse<void>>(`/parlays/${id}`);
   return response.data;
 };
 
