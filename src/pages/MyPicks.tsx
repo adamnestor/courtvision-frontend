@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserPicks } from "../services/api";
-
+import PicksList from "../components/picks/PicksList";
+import ParlayList from "../components/picks/ParlayList";
 import { Loader2 } from "lucide-react";
 
 export const MyPicks = () => {
