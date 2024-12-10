@@ -28,6 +28,10 @@ export interface PickResponse {
   threshold: number;
   hitRateAtPick: number;
   isParlay: boolean;
+  parlayId?: number;
+  playerName: string;
+  team: string;
+  opponent: string;
   result?: "WIN" | "LOSS";
   createdAt: string;
 }

@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUserPicks } from "../services/api";
 import PicksList from "../components/picks/PicksList";
 import ParlayList from "../components/picks/ParlayList";
 import { Loader2 } from "lucide-react";
+import { picksService } from "../services/picksService";
 
 export const MyPicks = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["picks"],
-    queryFn: getUserPicks,
+    queryFn: picksService.getUserPicks,
   });
 
   if (isLoading) {
@@ -26,22 +26,19 @@ export const MyPicks = () => {
     );
   }
 
-  const allPicks = data?.data || [];
+  const { singles = [], parlays = [] } = data || { singles: [], parlays: [] };
 
-  const todaysSingles = allPicks.filter(
-    (pick) => !pick.isParlay && isToday(new Date(pick.createdAt))
+  const todaysSingles = singles.filter((pick) =>
+    isToday(new Date(pick.createdAt))
   );
-
-  const todaysParlays = allPicks.filter(
-    (pick) => pick.isParlay && isToday(new Date(pick.createdAt))
+  const todaysParlays = parlays.filter((parlay) =>
+    isToday(new Date(parlay.createdAt))
   );
-
-  const yesterdaySingles = allPicks.filter(
-    (pick) => !pick.isParlay && isYesterday(new Date(pick.createdAt))
+  const yesterdaySingles = singles.filter((pick) =>
+    isYesterday(new Date(pick.createdAt))
   );
-
-  const yesterdayParlays = allPicks.filter(
-    (pick) => pick.isParlay && isYesterday(new Date(pick.createdAt))
+  const yesterdayParlays = parlays.filter((parlay) =>
+    isYesterday(new Date(parlay.createdAt))
   );
 
   return (
@@ -146,3 +143,5 @@ function isYesterday(date: Date) {
     date.getFullYear() === yesterday.getFullYear()
   );
 }
+
+export default MyPicks;
