@@ -10,6 +10,7 @@ import { AdminDashboard } from "./components/dashboard/AdminDashboard";
 import { PlayerDetail } from "./pages/PlayerDetail";
 import { ParlayBuilderProvider } from "./context/ParlayBuilderContext";
 import { Toaster } from "react-hot-toast";
+import MyPicks from "./pages/MyPicks";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -36,6 +37,7 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/player/:playerId" element={<PlayerDetail />} />
+                  <Route path="/picks" element={<MyPicks />} />
                 </Route>
 
                 {/* Admin Routes */}
