@@ -30,23 +30,23 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
 
   const handleSinglePick = async () => {
     try {
-      const response = await createSinglePick({
+      // Use your configured API instance instead of direct fetch/axios call
+      const response = createSinglePick({
         playerId: player.playerId,
-        category: summary.category as PickCategory,
+        category: summary.category,
         threshold: summary.threshold,
         hitRateAtPick: summary.hitRate,
         isParlay: false,
       });
 
-      if (response.error) {
-        toast.error(response.error);
-        return;
+      if (response.success) {
+        toast.success("Pick saved successfully!");
+      } else {
+        toast.error(response.message || "Failed to save pick");
       }
-
-      toast.success("Pick saved successfully!");
     } catch (error) {
-      toast.error("Failed to save pick");
       console.error("Error saving pick:", error);
+      toast.error("Failed to save pick");
     }
   };
 

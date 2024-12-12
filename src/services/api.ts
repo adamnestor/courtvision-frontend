@@ -2,7 +2,6 @@ import axios from "axios";
 import { authService } from "./authService";
 import { ApiResponse, CreatePickRequest, PickResponse } from "../types/api";
 
-
 const api = axios.create({
   baseURL: "http://localhost:8080/api",
   withCredentials: true,
@@ -15,7 +14,7 @@ api.interceptors.request.use(
   (config) => {
     const user = authService.getCurrentUser();
     if (user?.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+      config.headers["Authorization"] = `Bearer ${user.token}`;
       // For debugging
       console.log("Adding token to request:", config.headers.Authorization);
     }
