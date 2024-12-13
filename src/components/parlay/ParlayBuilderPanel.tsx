@@ -1,9 +1,44 @@
 import { XCircle, X, Trash2 } from "lucide-react";
 import { useParlayBuilder } from "../../context/ParlayBuilderContext";
+import { toast } from "react-hot-toast";
+import { createParlay } from "../../services/api";
 
 export const ParlayBuilderPanel = () => {
   const { state, removePick, clearPicks, togglePanel } = useParlayBuilder();
   const { picks, isOpen } = state;
+
+  const handleSaveParlay = async () => {
+    try {
+      if (picks.length < 2) {
+        toast.error("Parlays must have at least 2 picks");
+        return;
+      }
+
+      console.log("Attempting to save parlay with picks:", picks);
+      const pickRequests = picks.map((pick) => ({
+        playerId: pick.playerId,
+        category: pick.category,
+        threshold: pick.threshold,
+        hitRateAtPick: pick.hitRate,
+        isParlay: true,
+      }));
+      console.log("Formatted pick requests:", pickRequests);
+
+      const response = await createParlay(pickRequests);
+      console.log("Parlay response:", response);
+
+      if (response.data) {
+        toast.success("Parlay saved successfully!");
+        clearPicks();
+        togglePanel();
+      } else {
+        toast.error(response.message || "Failed to save parlay");
+      }
+    } catch (error) {
+      console.error("Error saving parlay:", error);
+      toast.error("Failed to save parlay");
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -62,8 +97,9 @@ export const ParlayBuilderPanel = () => {
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="space-y-2">
           <button
+            onClick={handleSaveParlay}
             className="w-full py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={picks.length === 0}
+            disabled={picks.length < 2}
           >
             Save Parlay
           </button>

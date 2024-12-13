@@ -37,6 +37,13 @@ export const createSinglePick = async (
   return response.data;
 };
 
+export const createParlay = async (
+  picks: CreatePickRequest[]
+): Promise<ApiResponse<PickResponse[]>> => {
+  const response = await api.post<ApiResponse<PickResponse[]>>("/picks/parlay", picks);
+  return response.data;
+};
+
 export const getUserPicks = async () => {
   const response = await api.get<ApiResponse<PickResponse>>("/picks");
   return response;
