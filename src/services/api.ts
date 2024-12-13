@@ -28,6 +28,8 @@ api.interceptors.request.use(
 export const createSinglePick = async (
   data: CreatePickRequest
 ): Promise<ApiResponse<PickResponse>> => {
+  console.log("Sending pick request:", data);
+  console.log("Current auth token:", authService.getCurrentUser()?.token);
   const response = await api.post<ApiResponse<PickResponse>>("/picks", {
     ...data,
     isParlay: false,
