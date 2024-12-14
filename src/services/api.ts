@@ -40,7 +40,10 @@ export const createSinglePick = async (
 export const createParlay = async (
   picks: CreatePickRequest[]
 ): Promise<ApiResponse<PickResponse[]>> => {
-  const response = await api.post<ApiResponse<PickResponse[]>>("/picks/parlay", picks);
+  const response = await api.post<ApiResponse<PickResponse[]>>(
+    "/picks/parlay",
+    picks
+  );
   return response.data;
 };
 
@@ -54,8 +57,8 @@ export const deletePick = async (id: number): Promise<ApiResponse<void>> => {
   return response.data;
 };
 
-export const deleteParlay = async (id: number): Promise<ApiResponse<void>> => {
-  const response = await api.delete<ApiResponse<void>>(`/parlays/${id}`);
+export const deleteParlay = async (id: string): Promise<ApiResponse<void>> => {
+  const response = await api.delete<ApiResponse<void>>(`/picks/parlay/${id}`);
   return response.data;
 };
 
