@@ -99,7 +99,7 @@ export default function MyPicks() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Last 24h</span>
+                <span className="text-sm text-gray-500">Yesterday</span>
                 <span className="font-semibold">
                   {calculateSuccess(
                     [...todaysSingles, ...yesterdaySingles],
