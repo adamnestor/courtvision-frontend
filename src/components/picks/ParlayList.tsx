@@ -14,10 +14,14 @@ import { format } from "date-fns";
 
 interface ParlayListProps {
   parlays: Parlay[];
+  isToday?: boolean;
 }
 
-export default function ParlayList({ parlays }: ParlayListProps) {
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+export default function ParlayList({
+  parlays,
+  isToday = false,
+}: ParlayListProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { mutate: handleDeleteParlay, isPending } = useMutation({
@@ -38,7 +42,8 @@ export default function ParlayList({ parlays }: ParlayListProps) {
           <div className="p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {parlay.result !== undefined &&
+                {!isToday &&
+                  parlay.result !== undefined &&
                   (parlay.result ? (
                     <CheckCircle className="text-green-500" size={16} />
                   ) : (
@@ -49,10 +54,10 @@ export default function ParlayList({ parlays }: ParlayListProps) {
                     Parlay #{parlay.id} ({parlay.picks.length} picks)
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {format(new Date(parlay.createdAt), "h:mm a")} •
-                    {parlay.result !== undefined && (
+                    {format(new Date(parlay.createdAt), "h:mm a")}
+                    {!isToday && parlay.result !== undefined && (
                       <span className="ml-1">
-                        {parlay.picks.filter((p) => p.result).length}/
+                        • {parlay.picks.filter((p) => p.result).length}/
                         {parlay.picks.length} correct
                       </span>
                     )}
@@ -61,7 +66,7 @@ export default function ParlayList({ parlays }: ParlayListProps) {
               </div>
 
               <div className="flex items-center gap-2">
-                {!parlay.result && (
+                {isToday && ( // Only show delete button for today's parlays
                   <button
                     onClick={() => handleDeleteParlay(parlay.id)}
                     disabled={isPending}
@@ -98,7 +103,8 @@ export default function ParlayList({ parlays }: ParlayListProps) {
                     key={pick.id}
                     className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded"
                   >
-                    {pick.result !== undefined &&
+                    {!isToday &&
+                      pick.result !== undefined &&
                       (pick.result ? (
                         <CheckCircle className="text-green-500" size={14} />
                       ) : (

@@ -166,7 +166,7 @@ export default function MyPicks() {
               </h3>
               <div className="h-64 overflow-y-auto">
                 {todaysSingles.length > 0 ? (
-                  <PicksList picks={todaysSingles} />
+                  <PicksList picks={todaysSingles} isToday={true} />
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400">
                     No single picks for today
@@ -182,7 +182,7 @@ export default function MyPicks() {
               </h3>
               <div className="h-64 overflow-y-auto">
                 {todaysParlays.length > 0 ? (
-                  <ParlayList parlays={todaysParlays} />
+                  <ParlayList parlays={todaysParlays} isToday={true} />
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400">
                     No parlays for today

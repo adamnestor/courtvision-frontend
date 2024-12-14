@@ -7,9 +7,10 @@ import { format } from "date-fns";
 
 interface PicksListProps {
   picks: UserPickDTO[];
+  isToday?: boolean;
 }
 
-export default function PicksList({ picks }: PicksListProps) {
+export default function PicksList({ picks, isToday = false }: PicksListProps) {
   const queryClient = useQueryClient();
 
   const { mutate: handleDeletePick, isPending } = useMutation({
@@ -35,7 +36,8 @@ export default function PicksList({ picks }: PicksListProps) {
               <div className="font-medium text-gray-900 dark:text-white">
                 {pick.playerName}
               </div>
-              {pick.result !== undefined &&
+              {!isToday &&
+                pick.result !== undefined &&
                 (pick.result ? (
                   <CheckCircle className="text-green-500" size={16} />
                 ) : (
@@ -52,7 +54,7 @@ export default function PicksList({ picks }: PicksListProps) {
             </div>
           </div>
 
-          {!pick.result && (
+          {isToday && ( // Only show delete button for today's picks
             <button
               onClick={() => handleDeletePick(pick.id)}
               disabled={isPending}

@@ -3,7 +3,7 @@ import { Category } from "./dashboard";
 export type PickCategory = Exclude<Category, "ALL">;
 
 export interface Pick {
-  id: string; // Temporary ID for pending picks
+  id: string; 
   playerId: number;
   playerName: string;
   team: string;

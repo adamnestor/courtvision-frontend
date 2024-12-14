@@ -12,7 +12,7 @@ export interface UserPickDTO {
 }
 
 export interface Parlay {
-  id: number;
+  id: string;
   picks: UserPickDTO[];
   result?: boolean;
   createdAt: string;
