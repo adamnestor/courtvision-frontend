@@ -15,8 +15,18 @@ const calculateCategorySuccess = (
   parlays: Parlay[],
   category: string
 ) => {
-  const categoryPicks = picks.filter((pick) => pick.category === category);
+  // Filter out today's picks and get only completed picks
+  const categoryPicks = picks
+    .filter(
+      (pick) => !isToday(new Date(pick.createdAt)) && pick.result !== undefined
+    )
+    .filter((pick) => pick.category === category);
+
   const parlayPicks = parlays
+    .filter(
+      (parlay) =>
+        !isToday(new Date(parlay.createdAt)) && parlay.result !== undefined
+    )
     .flatMap((parlay) => parlay.picks)
     .filter((pick) => pick.category === category);
 
@@ -31,10 +41,22 @@ const calculateSuccess = (
   singles: UserPickDTO[],
   parlays: Parlay[]
 ): string => {
-  const singlesSuccess = singles.filter((pick) => pick.result).length;
-  const parlaysSuccess = parlays.filter((parlay) => parlay.result).length;
-  const total = singles.length + parlays.length;
+  // Filter out picks from today and those without results
+  const completedSingles = singles.filter(
+    (pick) => !isToday(new Date(pick.createdAt)) && pick.result !== undefined
+  );
+  const completedParlays = parlays.filter(
+    (parlay) =>
+      !isToday(new Date(parlay.createdAt)) && parlay.result !== undefined
+  );
+
+  const singlesSuccess = completedSingles.filter((pick) => pick.result).length;
+  const parlaysSuccess = completedParlays.filter(
+    (parlay) => parlay.result
+  ).length;
+  const total = completedSingles.length + completedParlays.length;
   const successes = singlesSuccess + parlaysSuccess;
+
   return total > 0 ? ((successes / total) * 100).toFixed(1) : "0";
 };
 
@@ -166,7 +188,17 @@ export default function MyPicks() {
               {calculateSuccess(singles, parlays)}%
             </p>
             <p className="text-xs text-gray-500">
-              Total Picks: {singles.length + parlays.length}
+              Total Picks:{" "}
+              {singles.filter(
+                (pick) =>
+                  !isToday(new Date(pick.createdAt)) &&
+                  pick.result !== undefined
+              ).length +
+                parlays.filter(
+                  (parlay) =>
+                    !isToday(new Date(parlay.createdAt)) &&
+                    parlay.result !== undefined
+                ).length}
             </p>
           </div>
 
@@ -181,8 +213,19 @@ export default function MyPicks() {
                 {calculateCategorySuccess(singles, parlays, category)}%
               </p>
               <p className="text-xs text-gray-500">
-                {singles.filter((pick) => pick.category === category).length +
+                {singles
+                  .filter(
+                    (pick) =>
+                      !isToday(new Date(pick.createdAt)) &&
+                      pick.result !== undefined
+                  )
+                  .filter((pick) => pick.category === category).length +
                   parlays
+                    .filter(
+                      (parlay) =>
+                        !isToday(new Date(parlay.createdAt)) &&
+                        parlay.result !== undefined
+                    )
                     .flatMap((p) => p.picks)
                     .filter((pick) => pick.category === category).length}{" "}
                 picks

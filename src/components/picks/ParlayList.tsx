@@ -35,6 +35,10 @@ export default function ParlayList({
     },
   });
 
+  const formatParlayLabel = (parlay: Parlay) => {
+    return `${parlay.picks.length}-Pick Parlay`;
+  };
+
   return (
     <div className="space-y-2">
       {parlays.map((parlay) => (
@@ -51,7 +55,7 @@ export default function ParlayList({
                   ))}
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">
-                    Parlay #{parlay.id} ({parlay.picks.length} picks)
+                    {formatParlayLabel(parlay)}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
                     {format(new Date(parlay.createdAt), "h:mm a")}
@@ -66,7 +70,7 @@ export default function ParlayList({
               </div>
 
               <div className="flex items-center gap-2">
-                {isToday && ( // Only show delete button for today's parlays
+                {isToday && (
                   <button
                     onClick={() => handleDeleteParlay(parlay.id)}
                     disabled={isPending}
