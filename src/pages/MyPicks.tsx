@@ -6,6 +6,9 @@ import PicksList from "../components/picks/PicksList";
 import ParlayList from "../components/picks/ParlayList";
 import { isToday, isYesterday } from "date-fns";
 import { UserPickDTO, Parlay } from "../types/picks";
+import { toast } from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import api from "../services/api";
 
 const calculateCategorySuccess = (
   picks: UserPickDTO[],
@@ -37,6 +40,7 @@ const calculateSuccess = (
 
 export default function MyPicks() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery<{
     singles: UserPickDTO[];
     parlays: Parlay[];
@@ -44,6 +48,28 @@ export default function MyPicks() {
     queryKey: ["picks"],
     queryFn: picksService.getUserPicks,
   });
+
+  const processYesterdayResults = async () => {
+    try {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const formattedDate = yesterday.toISOString().split("T")[0];
+
+      const response = await api.post(
+        `/picks/results/process/${formattedDate}`
+      );
+
+      if (response.data.success) {
+        toast.success("Results processed successfully");
+        queryClient.invalidateQueries({ queryKey: ["picks"] });
+      } else {
+        throw new Error(response.data.message || "Failed to process results");
+      }
+    } catch (error) {
+      toast.error("Failed to process results");
+      console.error("Error processing results:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -87,6 +113,18 @@ export default function MyPicks() {
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
         </button>
+
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            My Picks
+          </h1>
+          <button
+            onClick={processYesterdayResults}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Process Yesterday's Results
+          </button>
+        </div>
 
         {/* Header */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
