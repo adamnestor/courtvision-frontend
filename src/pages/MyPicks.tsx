@@ -192,6 +192,46 @@ export default function MyPicks() {
             </div>
           </div>
         </div>
+
+        {/* Yesterday's Results Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Yesterday's Results
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Yesterday's Singles */}
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                Singles ({yesterdaySingles.length})
+              </h3>
+              <div className="h-64 overflow-y-auto">
+                {yesterdaySingles.length > 0 ? (
+                  <PicksList picks={yesterdaySingles} isToday={false} />
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No single picks from yesterday
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Yesterday's Parlays */}
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                Parlays ({yesterdayParlays.length})
+              </h3>
+              <div className="h-64 overflow-y-auto">
+                {yesterdayParlays.length > 0 ? (
+                  <ParlayList parlays={yesterdayParlays} isToday={false} />
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No parlays from yesterday
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
