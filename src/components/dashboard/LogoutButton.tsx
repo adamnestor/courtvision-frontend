@@ -13,9 +13,8 @@ export const LogoutButton = () => {
   return (
     <button
       onClick={handleLogout}
-      className="px-4 py-2 text-sm font-medium text-white bg-black rounded-md 
-                hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+      className="glass-card px-4 py-2 text-sm font-medium text-white rounded-lg 
+                hover:bg-white/20 transition-colors"
     >
       Logout
     </button>

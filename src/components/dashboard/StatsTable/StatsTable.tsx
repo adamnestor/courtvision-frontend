@@ -5,7 +5,6 @@ import { StatsTableRow } from "./StatsTableRow";
 import { StatsTableHeader } from "./StatsTableHeader";
 import { Category, TimePeriod, Threshold } from "../../../types/dashboard";
 import { ApiResponse } from "../../../types/api";
-import { authService } from "../../../services/authService";
 
 interface StatsTableProps {
   timePeriod: TimePeriod;
@@ -23,8 +22,6 @@ export const StatsTable = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Current user:", authService.getCurrentUser());
-
     const fetchStats = async () => {
       setLoading(true);
       setError(null);
@@ -53,28 +50,26 @@ export const StatsTable = ({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
-        <div className="text-center text-gray-600 dark:text-gray-400">
-          Loading...
-        </div>
+      <div className="glass-card rounded-lg p-8">
+        <div className="text-center text-white/60">Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
-        <div className="text-center text-red-500">{error}</div>
+      <div className="glass-card rounded-lg p-8">
+        <div className="text-center text-cv-error-from">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+    <div className="glass-card rounded-lg overflow-hidden">
       <StatsTableHeader />
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="divide-y divide-white/10">
         {stats.length === 0 ? (
-          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+          <div className="p-4 text-center text-white/60">
             No stats available for the selected filters
           </div>
         ) : (

@@ -29,7 +29,7 @@ export const FilterBar = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+    <div className="glass-card rounded-lg shadow-sm p-4 bg-gradient-to-r from-cv-indigo/10 via-cv-purple/10 to-cv-pink/10">
       <div className="flex flex-wrap gap-4">
         <TimePeriodSelect value={timePeriod} onChange={onTimePeriodChange} />
         <CategorySelect
