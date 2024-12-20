@@ -24,70 +24,68 @@ export default function ParlayList({
 }: ParlayListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const formatParlayLabel = (parlay: Parlay) => {
-    return `${parlay.picks.length}-Pick Parlay`;
-  };
-
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {parlays.length === 0 ? (
-        <div className="text-white/60 text-center py-4">
+        <div className="text-black/60 text-center py-4">
           No parlays available
         </div>
       ) : (
         parlays.map((parlay) => (
           <div
             key={parlay.id}
-            className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/10"
+            className="bg-black/20 backdrop-blur-md border border-black/30 rounded-lg overflow-hidden"
           >
-            <div className="p-3">
+            <div className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {!isToday &&
-                    parlay.result !== undefined &&
-                    (parlay.result ? (
-                      <CheckCircle className="text-cv-success-to" size={16} />
-                    ) : (
-                      <XCircle className="text-cv-error-from" size={16} />
-                    ))}
+                <div className="flex items-center gap-3">
+                  <div className="bg-black/20 backdrop-blur-md rounded-lg px-3 py-1">
+                    <span className="text-black font-medium">
+                      {parlay.picks.length}
+                    </span>
+                    <span className="text-black/60 text-sm ml-1">picks</span>
+                  </div>
                   <div>
-                    <div className="font-medium text-white">
-                      {formatParlayLabel(parlay)}
-                    </div>
-                    <div className="text-sm text-white/60">
-                      {format(new Date(parlay.createdAt), "h:mm a")}
-                      {!isToday && parlay.result !== undefined && (
-                        <span className="ml-1">
-                          • {parlay.picks.filter((p) => p.result).length}/
+                    {!isToday && parlay.result !== undefined && (
+                      <div className="flex items-center gap-1.5">
+                        {parlay.result ? (
+                          <CheckCircle className="text-cv-success-to h-4 w-4" />
+                        ) : (
+                          <XCircle className="text-cv-error-from h-4 w-4" />
+                        )}
+                        <span className="text-black/80 text-sm">
+                          {parlay.picks.filter((p) => p.result).length}/
                           {parlay.picks.length} correct
                         </span>
-                      )}
+                      </div>
+                    )}
+                    <div className="text-black/50 text-sm">
+                      {format(new Date(parlay.createdAt), "h:mm a")}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   {isToday && onDelete && (
                     <button
                       onClick={() => onDelete(parlay.id)}
                       disabled={isDeleting}
-                      className="text-white/40 hover:text-cv-error-from transition-colors disabled:opacity-50"
+                      className="text-black/40 hover:text-cv-error-from transition-colors disabled:opacity-50"
                       title="Delete parlay"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 className="h-5 w-5" />
                     </button>
                   )}
                   <button
                     onClick={() =>
                       setExpandedId(expandedId === parlay.id ? null : parlay.id)
                     }
-                    className="text-white/40 hover:text-white transition-colors"
-                    title={expandedId === parlay.id ? "Collapse" : "Expand"}
+                    className="text-black/40 hover:text-black transition-colors"
                   >
                     {expandedId === parlay.id ? (
-                      <ChevronUp size={16} />
+                      <ChevronUp className="h-5 w-5" />
                     ) : (
-                      <ChevronDown size={16} />
+                      <ChevronDown className="h-5 w-5" />
                     )}
                   </button>
                 </div>
@@ -95,34 +93,37 @@ export default function ParlayList({
             </div>
 
             {expandedId === parlay.id && (
-              <div className="px-3 pb-3 border-t border-white/10">
-                <div className="space-y-2 pt-2">
-                  {parlay.picks.map((pick) => (
-                    <div
-                      key={pick.id}
-                      className="flex items-center gap-2 p-2 bg-white/5 rounded-lg"
-                    >
-                      {!isToday &&
-                        pick.result !== undefined &&
-                        (pick.result ? (
-                          <CheckCircle
-                            className="text-cv-success-to"
-                            size={14}
-                          />
+              <div className="px-4 pb-4 space-y-2">
+                {parlay.picks.map((pick) => (
+                  <div
+                    key={pick.id}
+                    className="bg-black/30 backdrop-blur-md rounded-lg p-3 flex items-center gap-3"
+                  >
+                    {!isToday && pick.result !== undefined && (
+                      <div>
+                        {pick.result ? (
+                          <CheckCircle className="text-cv-success-to h-4 w-4" />
                         ) : (
-                          <XCircle className="text-cv-error-from" size={14} />
-                        ))}
-                      <div className="text-sm text-white">
-                        <span className="font-medium">{pick.playerName}</span>{" "}
-                        {pick.threshold}+ {pick.category.toLowerCase()} (
-                        {pick.hitRateAtPick}%)
-                        <div className="text-xs text-white/40">
-                          {pick.team} vs {pick.opponent}
-                        </div>
+                          <XCircle className="text-cv-error-from h-4 w-4" />
+                        )}
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-black font-medium">
+                        {pick.playerName}
+                      </div>
+                      <div className="text-black/80 text-sm">
+                        {pick.threshold}+ {pick.category.toLowerCase()}
+                        <span className="text-cv-success-from ml-1">
+                          ({pick.hitRateAtPick}%)
+                        </span>
+                      </div>
+                      <div className="text-black/50 text-xs">
+                        {pick.team} vs {pick.opponent}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

@@ -162,6 +162,7 @@ export default function MyPicks() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-cv-indigo/5 via-cv-purple/5 to-cv-pink/5 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
         <div className="flex justify-between items-center mb-8">
           <button
             onClick={() => navigate("/dashboard")}
@@ -173,7 +174,7 @@ export default function MyPicks() {
 
           <button
             onClick={processYesterdayResults}
-            className="px-4 py-2 glass-card rounded-lg text-white hover:bg-white/20 transition-colors"
+            className="px-4 py-2 bg-gradient-to-r from-cv-indigo/20 to-cv-purple/20 hover:from-cv-indigo/30 hover:to-cv-purple/30 transition-colors rounded-lg text-black border border-white/10"
           >
             Process Yesterday's Results
           </button>
@@ -237,92 +238,131 @@ export default function MyPicks() {
         </div>
 
         {/* Today's Picks Section */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 mb-6 border border-white/10">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Today's Picks
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white/10 rounded-lg p-4 border border-white/10">
-              <h3 className="font-medium text-white mb-4">
-                Singles (
-                {
-                  singles.filter((pick) => isToday(new Date(pick.createdAt)))
-                    .length
-                }
-                )
-              </h3>
-              <PicksList
-                picks={singles.filter((pick) =>
-                  isToday(new Date(pick.createdAt))
-                )}
-                isToday={true}
-                onDelete={handleDeletePick}
-                isDeleting={isDeletePickPending}
-              />
-            </div>
+        <div className="glass-card rounded-lg shadow-sm p-4 bg-gradient-to-r from-cv-indigo/10 via-cv-purple/10 to-cv-pink/10">
+          {/* Decorative Elements */}
+          <div className="absolute inset-0 bg-white/[0.02] bg-grid" />
+          <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-cv-purple/30 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-cv-pink/30 blur-3xl" />
 
-            <div className="bg-white/10 rounded-lg p-4 border border-white/10">
-              <h3 className="font-medium text-white mb-4">
-                Parlays (
-                {
-                  parlays.filter((parlay) =>
-                    isToday(new Date(parlay.createdAt))
-                  ).length
-                }
-                )
-              </h3>
-              <ParlayList
-                parlays={parlays.filter((parlay) =>
-                  isToday(new Date(parlay.createdAt))
-                )}
-                isToday={true}
-                onDelete={handleDeleteParlay}
-                isDeleting={isDeleteParlayPending}
-              />
+          <div className="relative">
+            <h2 className="text-xl font-semibold text-black mb-6">
+              Today's Picks
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Singles */}
+              <div className="glass-card rounded-lg p-4">
+                <h3 className="font-medium text-black mb-4 flex items-center justify-between">
+                  <span>Singles</span>
+                  <span className="text-sm text-black/60">
+                    (
+                    {
+                      singles.filter((pick) =>
+                        isToday(new Date(pick.createdAt))
+                      ).length
+                    }
+                    )
+                  </span>
+                </h3>
+                <div className="h-[400px] overflow-y-auto">
+                  <PicksList
+                    picks={singles.filter((pick) =>
+                      isToday(new Date(pick.createdAt))
+                    )}
+                    isToday={true}
+                    onDelete={handleDeletePick}
+                    isDeleting={isDeletePickPending}
+                  />
+                </div>
+              </div>
+
+              {/* Parlays */}
+              <div className="glass-card rounded-lg p-4">
+                <h3 className="font-medium text-black mb-4 flex items-center justify-between">
+                  <span>Parlays</span>
+                  <span className="text-sm text-black/60">
+                    (
+                    {
+                      parlays.filter((parlay) =>
+                        isToday(new Date(parlay.createdAt))
+                      ).length
+                    }
+                    )
+                  </span>
+                </h3>
+                <div className="h-[400px] overflow-y-auto">
+                  <ParlayList
+                    parlays={parlays.filter((parlay) =>
+                      isToday(new Date(parlay.createdAt))
+                    )}
+                    isToday={true}
+                    onDelete={handleDeleteParlay}
+                    isDeleting={isDeleteParlayPending}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Yesterday's Results Section */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Yesterday's Results
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white/10 rounded-lg p-4 border border-white/10">
-              <h3 className="font-medium text-white mb-4">
-                Singles (
-                {
-                  singles.filter((pick) =>
-                    isYesterday(new Date(pick.createdAt))
-                  ).length
-                }
-                )
-              </h3>
-              <PicksList
-                picks={singles.filter((pick) =>
-                  isYesterday(new Date(pick.createdAt))
-                )}
-                isToday={false}
-              />
-            </div>
+        {/* Yesterday's Results Section - Similar Structure */}
+        <div className="glass-card rounded-lg shadow-sm p-4 bg-gradient-to-r from-cv-indigo/10 via-cv-purple/10 to-cv-pink/10">
+          {/* Decorative Elements */}
+          <div className="absolute inset-0 bg-white/[0.02] bg-grid" />
+          <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-cv-purple/30 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-cv-pink/30 blur-3xl" />
 
-            <div className="bg-white/10 rounded-lg p-4 border border-white/10">
-              <h3 className="font-medium text-white mb-4">
-                Parlays (
-                {
-                  parlays.filter((parlay) =>
-                    isYesterday(new Date(parlay.createdAt))
-                  ).length
-                }
-                )
-              </h3>
-              <ParlayList
-                parlays={parlays.filter((parlay) =>
-                  isYesterday(new Date(parlay.createdAt))
-                )}
-                isToday={false}
-              />
+          <div className="relative">
+            <h2 className="text-xl font-semibold text-black mb-6">
+              Yesterday's Results
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Singles */}
+              <div className="glass-card rounded-lg p-4">
+                <h3 className="font-medium text-black mb-4 flex items-center justify-between">
+                  <span>Singles</span>
+                  <span className="text-sm text-black/60">
+                    (
+                    {
+                      singles.filter((pick) =>
+                        isYesterday(new Date(pick.createdAt))
+                      ).length
+                    }
+                    )
+                  </span>
+                </h3>
+                <div className="h-[400px] overflow-y-auto">
+                  <PicksList
+                    picks={singles.filter((pick) =>
+                      isYesterday(new Date(pick.createdAt))
+                    )}
+                    isToday={false}
+                  />
+                </div>
+              </div>
+
+              {/* Parlays */}
+              <div className="glass-card rounded-lg p-4">
+                <h3 className="font-medium text-black mb-4 flex items-center justify-between">
+                  <span>Parlays</span>
+                  <span className="text-sm text-black/60">
+                    (
+                    {
+                      parlays.filter((parlay) =>
+                        isYesterday(new Date(parlay.createdAt))
+                      ).length
+                    }
+                    )
+                  </span>
+                </h3>
+                <div className="h-[400px] overflow-y-auto">
+                  <ParlayList
+                    parlays={parlays.filter((parlay) =>
+                      isYesterday(new Date(parlay.createdAt))
+                    )}
+                    isToday={false}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

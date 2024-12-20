@@ -46,4 +46,8 @@
   .glass-card-light {
     @apply bg-glass-lighter backdrop-blur-lg border border-white/30;
   }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
 }
