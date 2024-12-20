@@ -17,57 +17,30 @@ export const PlayerDetail = () => {
       initialThreshold: number;
     }) || {};
 
-  const getDefaultThreshold = (category: Category): number => {
-    switch (category) {
-      case "POINTS":
-        return 15;
-      case "ASSISTS":
-        return 4;
-      case "REBOUNDS":
-        return 8;
-      default:
-        return 15;
-    }
-  };
-
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("L10");
   const [category, setCategory] = useState<Category>(initialCategory);
   const [threshold, setThreshold] = useState<Threshold | null>(
     initialThreshold
   );
 
-  const handleCategoryChange = (newCategory: Category) => {
-    setCategory(newCategory);
-    setThreshold(getDefaultThreshold(newCategory));
-  };
-
-  const handleThresholdChange = (value: Threshold | null) => {
-    setThreshold(value);
-  };
-
   const {
     data: stats,
     isLoading,
     error,
-  } = usePlayerStats(
-    Number(playerId),
-    timePeriod,
-    category,
-    threshold ?? getDefaultThreshold(category) // Use category-specific default
-  );
+  } = usePlayerStats(Number(playerId), timePeriod, category, threshold ?? 15);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-r from-cv-indigo/5 via-cv-purple/5 to-cv-pink/5 flex items-center justify-center">
+        <div className="text-lg text-cv-purple">Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-red-500">
+      <div className="min-h-screen bg-gradient-to-r from-cv-indigo/5 via-cv-purple/5 to-cv-pink/5 flex items-center justify-center">
+        <div className="text-lg text-cv-error-from">
           {error instanceof Error
             ? error.message
             : "Failed to load player stats"}
@@ -76,44 +49,46 @@ export const PlayerDetail = () => {
     );
   }
 
-  if (!stats) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-red-500">No stats available</div>
-      </div>
-    );
-  }
+  if (!stats) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-r from-cv-indigo/5 via-cv-purple/5 to-cv-pink/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
         <button
           onClick={() => navigate("/dashboard")}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 mb-6 transition-colors"
+          className="flex items-center space-x-2 text-cv-purple hover:text-cv-indigo transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Dashboard</span>
         </button>
 
-        <PlayerDetailHeader stats={stats} />
-        <main className="mt-8 space-y-6">
+        <div className="space-y-6">
+          {/* Player Header with Stats */}
+          <div className="bg-gradient-to-r from-cv-indigo via-cv-purple to-cv-pink rounded-lg shadow-lg">
+            <PlayerDetailHeader stats={stats} />
+          </div>
+
+          {/* Filters */}
           <FilterBar
             timePeriod={timePeriod}
             category={category}
             threshold={threshold}
             onTimePeriodChange={setTimePeriod}
-            onCategoryChange={handleCategoryChange}
-            onThresholdChange={handleThresholdChange}
+            onCategoryChange={(category) => setCategory(category)}
+            onThresholdChange={(threshold) => setThreshold(threshold)}
             availableCategories={["POINTS", "ASSISTS", "REBOUNDS"]}
           />
-          <PlayerDetailChart
-            stats={stats}
-            statType={
-              category.toLowerCase() as "points" | "assists" | "rebounds"
-            }
-          />
-        </main>
+
+          {/* Performance Chart */}
+          <div className="glass-card rounded-lg p-6">
+            <PlayerDetailChart
+              stats={stats}
+              statType={
+                category.toLowerCase() as "points" | "assists" | "rebounds"
+              }
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

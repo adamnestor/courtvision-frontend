@@ -33,12 +33,12 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="w-full">
-      <div className="w-full text-center mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="w-full max-w-md">
+      <div className="w-full text-center mb-8 bg-gradient-to-r from-cv-indigo via-cv-purple to-cv-pink bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold tracking-tight">
           Welcome to CourtVision
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-500 mt-2">
           Enter your credentials to sign in
         </p>
       </div>
@@ -61,7 +61,7 @@ export const LoginForm = () => {
           required
         />
         {error && (
-          <div className="text-sm text-error flex items-center">
+          <div className="text-sm text-cv-error-from flex items-center">
             <AlertCircle className="mr-2 h-4 w-4" />
             {error}
           </div>
@@ -69,7 +69,7 @@ export const LoginForm = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-10 px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full h-10 bg-gradient-to-r from-cv-indigo via-cv-purple to-cv-pink text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isLoading ? (
             <>
@@ -81,8 +81,11 @@ export const LoginForm = () => {
         </button>
 
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Don't have an account? </span>
-          <a href="/register" className="text-black hover:underline">
+          <span className="text-gray-500">Don't have an account? </span>
+          <a
+            href="/register"
+            className="text-cv-purple hover:text-cv-indigo transition-colors"
+          >
             Register
           </a>
         </div>
