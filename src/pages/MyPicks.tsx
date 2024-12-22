@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Activity, TrendingUp } from "lucide-react";
 import { picksService } from "../services/picksService";
 import PicksList from "../components/picks/PicksList";
 import ParlayList from "../components/picks/ParlayList";
@@ -15,7 +15,6 @@ const calculateCategorySuccess = (
   parlays: Parlay[],
   category: string
 ) => {
-  // Filter out today's picks and get only completed picks
   const categoryPicks = picks
     .filter(
       (pick) => !isToday(new Date(pick.createdAt)) && pick.result !== undefined
@@ -41,7 +40,6 @@ const calculateSuccess = (
   singles: UserPickDTO[],
   parlays: Parlay[]
 ): string => {
-  // Filter out picks from today and those without results
   const completedSingles = singles.filter(
     (pick) => !isToday(new Date(pick.createdAt)) && pick.result !== undefined
   );
@@ -60,9 +58,41 @@ const calculateSuccess = (
   return total > 0 ? ((successes / total) * 100).toFixed(1) : "0";
 };
 
+const calculateRecentForm = (
+  singles: UserPickDTO[],
+  parlays: Parlay[]
+): string => {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const recentSingles = singles.filter(
+    (pick) =>
+      new Date(pick.createdAt) >= sevenDaysAgo &&
+      pick.result !== undefined &&
+      !isToday(new Date(pick.createdAt))
+  );
+
+  const recentParlays = parlays.filter(
+    (parlay) =>
+      new Date(parlay.createdAt) >= sevenDaysAgo &&
+      parlay.result !== undefined &&
+      !isToday(new Date(parlay.createdAt))
+  );
+
+  const totalRecent = recentSingles.length + recentParlays.length;
+  if (totalRecent === 0) return "0.0";
+
+  const successfulRecent =
+    recentSingles.filter((pick) => pick.result).length +
+    recentParlays.filter((parlay) => parlay.result).length;
+
+  return ((successfulRecent / totalRecent) * 100).toFixed(1);
+};
+
 export default function MyPicks() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
   const { data, isLoading, error } = useQuery<{
     singles: UserPickDTO[];
     parlays: Parlay[];
@@ -111,7 +141,6 @@ export default function MyPicks() {
 
   const { singles = [], parlays = [] } = data || { singles: [], parlays: [] };
 
-  // Filter picks by time period
   const todaysSingles = singles.filter((pick) =>
     isToday(new Date(pick.createdAt))
   );
@@ -148,88 +177,87 @@ export default function MyPicks() {
           </button>
         </div>
 
-        {/* Header */}
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-          My Picks
-        </h1>
-
         {/* Stats Overview */}
-        <div className="grid grid-cols-5 gap-4 mb-8">
-          {/* Time Period Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Yesterday</span>
-                <span className="font-semibold">
-                  {calculateSuccess(
-                    [...todaysSingles, ...yesterdaySingles],
-                    [...todaysParlays, ...yesterdayParlays]
-                  )}
-                  %
-                </span>
-              </div>
-              <div className="text-xs text-gray-500">
-                <div className="flex justify-between">
-                  <span>
-                    Singles: {todaysSingles.length + yesterdaySingles.length}
-                  </span>
-                  <span>
-                    Parlays: {todaysParlays.length + yesterdayParlays.length}
-                  </span>
-                </div>
+        <div className="grid grid-cols-6 gap-4 mb-8">
+          {/* Primary Stats */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+            <div className="flex items-center gap-3">
+              <Activity className="text-green-500" size={24} />
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Overall Success
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {calculateSuccess(singles, parlays)}%
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Overall Success Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <h3 className="text-sm text-gray-500">Overall</h3>
-            <p className="text-2xl font-bold">
-              {calculateSuccess(singles, parlays)}%
-            </p>
-            <p className="text-xs text-gray-500">
-              Total Picks:{" "}
-              {singles.filter(
-                (pick) =>
-                  !isToday(new Date(pick.createdAt)) &&
-                  pick.result !== undefined
-              ).length +
-                parlays.filter(
-                  (parlay) =>
-                    !isToday(new Date(parlay.createdAt)) &&
-                    parlay.result !== undefined
-                ).length}
-            </p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="text-blue-500" size={24} />
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Total Picks
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {singles.length + parlays.length}
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Category Cards */}
-          {["POINTS", "ASSISTS", "REBOUNDS"].map((category) => (
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+            <div className="flex items-center gap-3">
+              <Activity className="text-yellow-500" size={24} />
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Recent Form
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {calculateRecentForm(singles, parlays)}%
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Stats */}
+          {[
+            {
+              name: "POINTS",
+              icon: (props) => (
+                <TrendingUp {...props} className="text-purple-500" />
+              ),
+            },
+            {
+              name: "ASSISTS",
+              icon: (props) => (
+                <Activity {...props} className="text-indigo-500" />
+              ),
+            },
+            {
+              name: "REBOUNDS",
+              icon: (props) => (
+                <TrendingUp {...props} className="text-pink-500" />
+              ),
+            },
+          ].map(({ name, icon: Icon }) => (
             <div
-              key={category}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+              key={name}
+              className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow"
             >
-              <h3 className="text-sm text-gray-500">{category}</h3>
-              <p className="text-2xl font-bold">
-                {calculateCategorySuccess(singles, parlays, category)}%
-              </p>
-              <p className="text-xs text-gray-500">
-                {singles
-                  .filter(
-                    (pick) =>
-                      !isToday(new Date(pick.createdAt)) &&
-                      pick.result !== undefined
-                  )
-                  .filter((pick) => pick.category === category).length +
-                  parlays
-                    .filter(
-                      (parlay) =>
-                        !isToday(new Date(parlay.createdAt)) &&
-                        parlay.result !== undefined
-                    )
-                    .flatMap((p) => p.picks)
-                    .filter((pick) => pick.category === category).length}{" "}
-                picks
-              </p>
+              <div className="flex items-center gap-3">
+                <Icon size={24} />
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {name}
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {calculateCategorySuccess(singles, parlays, name)}%
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
