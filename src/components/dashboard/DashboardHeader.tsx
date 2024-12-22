@@ -3,10 +3,18 @@ import { ThemeToggle } from "../shared/ThemeToggle";
 import { LogoutButton } from "./LogoutButton";
 import { useNavigate } from "react-router-dom";
 import { History, Target, TrendingUp, CalendarDays } from "lucide-react";
+import { StatsRow } from "../../types/dashboard";
+import { calculateDashboardStats } from "../../utils/stats-utils";
 
-export const DashboardHeader = () => {
+interface DashboardHeaderProps {
+  stats: StatsRow[];
+}
+
+export const DashboardHeader = ({ stats }: DashboardHeaderProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { availablePicks, highConfidencePicks, gamesCount } =
+    calculateDashboardStats(stats);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -26,7 +34,9 @@ export const DashboardHeader = () => {
               <Target className="text-cv-success-to" size={24} />
               <div>
                 <p className="text-sm text-black/60">Available Picks</p>
-                <p className="text-2xl font-bold text-black">24</p>
+                <p className="text-2xl font-bold text-black">
+                  {availablePicks}
+                </p>
               </div>
             </div>
           </div>
@@ -37,7 +47,9 @@ export const DashboardHeader = () => {
               <TrendingUp className="text-cv-black" size={24} />
               <div>
                 <p className="text-sm text-black/60">80%+ Hit Rate</p>
-                <p className="text-2xl font-bold text-black">8</p>
+                <p className="text-2xl font-bold text-black">
+                  {highConfidencePicks}
+                </p>
               </div>
             </div>
           </div>
@@ -48,7 +60,7 @@ export const DashboardHeader = () => {
               <CalendarDays className="text-black" size={24} />
               <div>
                 <p className="text-sm text-black/60">Games Today</p>
-                <p className="text-2xl font-bold text-black">6</p>
+                <p className="text-2xl font-bold text-black">{gamesCount}</p>
               </div>
             </div>
           </div>
