@@ -8,6 +8,9 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { Dashboard } from "./components/dashboard/Dashboard";
 import { AdminDashboard } from "./components/dashboard/AdminDashboard";
 import { PlayerDetail } from "./pages/PlayerDetail";
+import { ParlayBuilderProvider } from "./context/ParlayBuilderContext";
+import { Toaster } from "react-hot-toast";
+import MyPicks from "./pages/MyPicks";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -21,30 +24,39 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+    <>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ParlayBuilderProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/player/:playerId" element={<PlayerDetail />} />
-            </Route>
+                {/* Protected Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/player/:playerId" element={<PlayerDetail />} />
+                  <Route path="/picks" element={<MyPicks />} />
+                </Route>
 
-            {/* Admin Routes */}
-            <Route element={<AdminRoute />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Route>
+                {/* Admin Routes */}
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                </Route>
 
-            {/* Default redirect */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+                {/* Default redirect */}
+                <Route
+                  path="/"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+              </Routes>
+            </BrowserRouter>
+          </ParlayBuilderProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+      <Toaster position="top-right" />
+    </>
   );
 }
 

@@ -72,7 +72,9 @@ export const PlayerDetailChart = ({
           >
             {[...games].reverse().map((game) => {
               const height = (game.selectedStatValue / maxDisplayValue) * 100;
-              const date = new Date(game.gameDate).toLocaleDateString("en-US", {
+              const date = new Date(
+                game.gameDate + "T12:00:00-05:00"
+              ).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               });
