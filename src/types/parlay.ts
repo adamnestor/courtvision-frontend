@@ -2,32 +2,32 @@ import { Category } from "./dashboard";
 
 export type PickCategory = Exclude<Category, "ALL">;
 
-export interface Pick {
-  id: string; 
+export interface ParlayPick {
+  id: string;
   playerId: number;
   playerName: string;
   team: string;
   opponent: string;
-  category: "POINTS" | "ASSISTS" | "REBOUNDS";
+  category: PickCategory;
   threshold: number;
   hitRate: number;
   timestamp: string;
 }
 
 export interface ParlayBuilderState {
-  picks: Pick[];
+  picks: ParlayPick[];
   isOpen: boolean;
 }
 
 export type ParlayBuilderAction =
-  | { type: "ADD_PICK"; pick: Pick }
+  | { type: "ADD_PICK"; pick: ParlayPick }
   | { type: "REMOVE_PICK"; id: string }
   | { type: "CLEAR_PICKS" }
   | { type: "TOGGLE_PANEL" };
 
 export interface ParlayBuilderContextType {
   state: ParlayBuilderState;
-  addPick: (pick: Pick) => void;
+  addPick: (pick: ParlayPick) => void;
   removePick: (id: string) => void;
   clearPicks: () => void;
   togglePanel: () => void;

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer } from "react";
 import {
-  Pick,
+  ParlayPick,
   ParlayBuilderState,
   ParlayBuilderAction,
   ParlayBuilderContextType,
@@ -51,7 +51,7 @@ export const ParlayBuilderProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const addPick = (pick: Pick) => {
+  const addPick = (pick: ParlayPick) => {
     dispatch({ type: "ADD_PICK", pick });
   };
 

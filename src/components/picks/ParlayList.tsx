@@ -1,4 +1,5 @@
 import { Parlay } from "../../types/picks";
+import { UserPickDTO } from "../../types/picks";
 import {
   ChevronDown,
   ChevronUp,
@@ -35,8 +36,18 @@ export default function ParlayList({
     },
   });
 
+  const calculateParlayHitRate = (picks: UserPickDTO[]): number => {
+    if (picks.length === 0) return 0;
+
+    const combinedRate =
+      picks.reduce((acc, pick) => acc * (pick.hitRateAtPick / 100), 1) * 100;
+
+    return Number(combinedRate.toFixed(1));
+  };
+
   const formatParlayLabel = (parlay: Parlay) => {
-    return `${parlay.picks.length}-Pick Parlay`;
+    const hitRate = calculateParlayHitRate(parlay.picks);
+    return `${parlay.picks.length}-Pick Parlay (${hitRate}% Combined)`;
   };
 
   return (

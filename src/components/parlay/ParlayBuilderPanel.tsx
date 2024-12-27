@@ -2,6 +2,7 @@ import { XCircle, X, Trash2 } from "lucide-react";
 import { useParlayBuilder } from "../../context/ParlayBuilderContext";
 import { toast } from "react-hot-toast";
 import { createParlay } from "../../services/api";
+import { ParlayPick } from "../../types/parlay";
 
 export const ParlayBuilderPanel = () => {
   const { state, removePick, clearPicks, togglePanel } = useParlayBuilder();
@@ -40,6 +41,15 @@ export const ParlayBuilderPanel = () => {
     }
   };
 
+  const calculateParlayHitRate = (picks: ParlayPick[]): number => {
+    if (picks.length === 0) return 0;
+
+    const combinedRate =
+      picks.reduce((acc, pick) => acc * (pick.hitRate / 100), 1) * 100;
+
+    return Number(combinedRate.toFixed(1));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -49,6 +59,11 @@ export const ParlayBuilderPanel = () => {
         <h2 className="text-lg font-semibold">
           Building Parlay ({picks.length} picks)
         </h2>
+        {picks.length > 1 && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Combined Hit Rate: {calculateParlayHitRate(picks)}%
+          </div>
+        )}
         <button
           onClick={togglePanel}
           className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
