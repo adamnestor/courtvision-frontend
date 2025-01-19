@@ -1,44 +1,20 @@
 import { XCircle, X, Trash2 } from "lucide-react";
 import { useParlayBuilder } from "../../context/ParlayBuilderContext";
+import { useParlay } from "../../hooks/useParlay";
 import { toast } from "react-hot-toast";
-import { createParlay } from "../../services/api";
 import { ParlayPick } from "../../types/parlay";
 
 export const ParlayBuilderPanel = () => {
   const { state, removePick, clearPicks, togglePanel } = useParlayBuilder();
   const { picks, isOpen } = state;
+  const { createParlay, isCreating } = useParlay();
 
-  const handleSaveParlay = async () => {
-    try {
-      if (picks.length < 2) {
-        toast.error("Parlays must have at least 2 picks");
-        return;
-      }
-
-      console.log("Attempting to save parlay with picks:", picks);
-      const pickRequests = picks.map((pick) => ({
-        playerId: pick.playerId,
-        category: pick.category,
-        threshold: pick.threshold,
-        hitRateAtPick: pick.hitRate,
-        isParlay: true,
-      }));
-      console.log("Formatted pick requests:", pickRequests);
-
-      const response = await createParlay(pickRequests);
-      console.log("Parlay response:", response);
-
-      if (response.data) {
-        toast.success("Parlay saved successfully!");
-        clearPicks();
-        togglePanel();
-      } else {
-        toast.error(response.message || "Failed to save parlay");
-      }
-    } catch (error) {
-      console.error("Error saving parlay:", error);
-      toast.error("Failed to save parlay");
+  const handleSaveParlay = () => {
+    if (picks.length < 2) {
+      toast.error("Parlays must have at least 2 picks");
+      return;
     }
+    createParlay(picks);
   };
 
   const calculateParlayHitRate = (picks: ParlayPick[]): number => {
@@ -113,10 +89,10 @@ export const ParlayBuilderPanel = () => {
         <div className="space-y-2">
           <button
             onClick={handleSaveParlay}
-            className="w-full py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={picks.length < 2}
+            disabled={isCreating || picks.length < 2}
+            className="btn btn-primary w-full"
           >
-            Save Parlay
+            {isCreating ? "Saving..." : "Save Parlay"}
           </button>
           {picks.length > 0 && (
             <button

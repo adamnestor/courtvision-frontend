@@ -4,8 +4,9 @@ import { ArrowLeft } from "lucide-react";
 import { PlayerDetailHeader } from "../components/player/PlayerDetailHeader";
 import { PlayerDetailChart } from "../components/player/PlayerDetailChart";
 import { FilterBar } from "../components/dashboard";
-import { usePlayerStats } from "../hooks/usePlayerStats";
 import { Category, TimePeriod, Threshold } from "../types/dashboard";
+import { usePlayerDetails } from "../hooks/usePlayerDetails";
+import { LoadingState } from "../components/common/LoadingState";
 
 export const PlayerDetail = () => {
   const { playerId } = useParams();
@@ -17,104 +18,60 @@ export const PlayerDetail = () => {
       initialThreshold: number;
     }) || {};
 
-  const getDefaultThreshold = (category: Category): number => {
-    switch (category) {
-      case "POINTS":
-        return 15;
-      case "ASSISTS":
-        return 4;
-      case "REBOUNDS":
-        return 8;
-      default:
-        return 15;
-    }
-  };
-
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("L10");
   const [category, setCategory] = useState<Category>(initialCategory);
-  const [threshold, setThreshold] = useState<Threshold | null>(
-    initialThreshold
-  );
+  const [threshold, setThreshold] = useState<Threshold>(initialThreshold);
 
-  const handleCategoryChange = (newCategory: Category) => {
-    setCategory(newCategory);
-    setThreshold(getDefaultThreshold(newCategory));
-  };
-
-  const handleThresholdChange = (value: Threshold | null) => {
-    setThreshold(value);
-  };
-
-  const {
-    data: stats,
-    isLoading,
-    error,
-  } = usePlayerStats(
+  const { stats, isLoading, createPick, isCreating } = usePlayerDetails(
     Number(playerId),
     timePeriod,
     category,
-    threshold ?? getDefaultThreshold(category) // Use category-specific default
+    threshold
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-red-500">
-          {error instanceof Error
-            ? error.message
-            : "Failed to load player stats"}
-        </div>
-      </div>
-    );
+    return <LoadingState message="Loading player stats..." />;
   }
 
   if (!stats) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg text-red-500">No stats available</div>
+        <div className="text-lg text-error">No stats available</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dashboard</span>
-        </button>
+    <div className="container mx-auto px-4 py-8">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center space-x-2 text-muted-foreground hover:text-foreground mb-6"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to Dashboard</span>
+      </button>
 
-        <PlayerDetailHeader stats={stats} />
-        <main className="mt-8 space-y-6">
-          <FilterBar
-            timePeriod={timePeriod}
-            category={category}
-            threshold={threshold}
-            onTimePeriodChange={setTimePeriod}
-            onCategoryChange={handleCategoryChange}
-            onThresholdChange={handleThresholdChange}
-            availableCategories={["POINTS", "ASSISTS", "REBOUNDS"]}
-          />
-          <PlayerDetailChart
-            stats={stats}
-            statType={
-              category.toLowerCase() as "points" | "assists" | "rebounds"
-            }
-          />
-        </main>
-      </div>
+      <PlayerDetailHeader
+        stats={stats}
+        onCreatePick={createPick}
+        isCreating={isCreating}
+      />
+
+      <main className="mt-8 space-y-6">
+        <FilterBar
+          timePeriod={timePeriod}
+          category={category}
+          threshold={threshold}
+          onTimePeriodChange={setTimePeriod}
+          onCategoryChange={setCategory}
+          onThresholdChange={setThreshold}
+          availableCategories={["POINTS", "ASSISTS", "REBOUNDS"]}
+        />
+        <PlayerDetailChart
+          stats={stats}
+          statType={category.toLowerCase() as "points" | "assists" | "rebounds"}
+        />
+      </main>
     </div>
   );
 };

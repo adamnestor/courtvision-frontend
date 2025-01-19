@@ -1,17 +1,8 @@
-import React from "react";
 import { Sun, Moon } from "lucide-react";
+import { useThemeContext } from "../../context/ThemeProvider";
 
 export const ThemeToggle = () => {
-  const [theme, setTheme] = React.useState<"light" | "dark">(
-    () => (localStorage.getItem("theme") as "light" | "dark") || "light"
-  );
-
-  React.useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  const { theme, setTheme } = useThemeContext();
 
   return (
     <button
@@ -20,9 +11,9 @@ export const ThemeToggle = () => {
       aria-label="Toggle theme"
     >
       {theme === "light" ? (
-        <Sun className="h-5 w-5" />
+        <Sun className="h-5 w-5 text-gray-600 dark:text-gray-400" />
       ) : (
-        <Moon className="h-5 w-5 text-white" />
+        <Moon className="h-5 w-5 text-gray-400 dark:text-gray-200" />
       )}
     </button>
   );

@@ -48,10 +48,41 @@
 
   html,
   body {
-    @apply w-full h-full m-0 p-0;
+    @apply h-full antialiased;
   }
 
-  body > div#root {
-    @apply w-full h-full;
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  #root {
+    @apply h-full;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium 
+           transition-colors focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
+           dark:focus-visible:ring-offset-gray-900;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90
+           dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80
+           dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80;
+  }
+
+  .input {
+    @apply flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 
+           text-sm ring-offset-background placeholder:text-muted-foreground 
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring 
+           focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50
+           dark:border-gray-700 dark:focus-visible:ring-offset-gray-900;
   }
 }

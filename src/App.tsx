@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./context/AuthProvider";
+import { AppProvider } from "./context/AppProvider";
 import { AdminRoute } from "./components/shared/AdminRoute";
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
@@ -8,55 +7,65 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { Dashboard } from "./components/dashboard/Dashboard";
 import { AdminDashboard } from "./components/dashboard/AdminDashboard";
 import { PlayerDetail } from "./pages/PlayerDetail";
-import { ParlayBuilderProvider } from "./context/ParlayBuilderContext";
-import { Toaster } from "react-hot-toast";
 import MyPicks from "./pages/MyPicks";
-
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+import { useAuthPersistence } from "./hooks/useAuthPersistence";
+import { useThemePersistence } from "./hooks/useThemePersistence";
+import { useApiErrorHandler } from "./hooks/useApiErrorHandler";
+import { useLoadingState } from "./hooks/useLoadingState";
+import { useUserPreferences } from "./hooks/useUserPreferences";
+import { LoadingOverlay } from "./components/LoadingOverlay";
+import { NotificationList } from "./components/NotificationList";
+import { useAuthStore } from "./hooks/useAuthStore";
+import { useAppSettings } from "./hooks/useAppSettings";
 
 function App() {
+  useAuthPersistence();
+  useThemePersistence();
+  useApiErrorHandler();
+  const { isLoading, loadingMessage } = useLoadingState();
+  const { compactView } = useUserPreferences();
+  const { isLoading: authLoading } = useAuthStore();
+  const { performance } = useAppSettings();
+
+  // Apply performance settings
+  const layoutClass = [
+    compactView ? "compact-layout" : "default-layout",
+    performance.reducedMotion ? "reduce-motion" : "",
+    performance.lowBandwidth ? "low-bandwidth" : "",
+  ].join(" ");
+
+  if (authLoading) {
+    return <LoadingOverlay message="Initializing app..." />;
+  }
+
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ParlayBuilderProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+    <AppProvider>
+      <div className={layoutClass}>
+        <BrowserRouter>
+          {isLoading && <LoadingOverlay message={loadingMessage} />}
+          <NotificationList />
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-                {/* Protected Routes */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/player/:playerId" element={<PlayerDetail />} />
-                  <Route path="/picks" element={<MyPicks />} />
-                </Route>
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/player/:playerId" element={<PlayerDetail />} />
+              <Route path="/picks" element={<MyPicks />} />
+            </Route>
 
-                {/* Admin Routes */}
-                <Route element={<AdminRoute />}>
-                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                </Route>
+            {/* Admin Routes */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            </Route>
 
-                {/* Default redirect */}
-                <Route
-                  path="/"
-                  element={<Navigate to="/dashboard" replace />}
-                />
-              </Routes>
-            </BrowserRouter>
-          </ParlayBuilderProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-      <Toaster position="top-right" />
-    </>
+            {/* Default redirect */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </AppProvider>
   );
 }
 

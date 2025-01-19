@@ -35,7 +35,7 @@ export const LoginForm = () => {
   return (
     <div className="w-full">
       <div className="w-full text-center mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Welcome to CourtVision
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -69,7 +69,7 @@ export const LoginForm = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-10 px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full h-10 px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center btn btn-primary"
         >
           {isLoading ? (
             <>
