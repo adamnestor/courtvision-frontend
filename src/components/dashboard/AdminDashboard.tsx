@@ -7,6 +7,7 @@ import { LoadingState } from "../common/LoadingState";
 import { Activity, Users, Settings, BarChart } from "lucide-react";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { RefreshControl } from "./RefreshControl";
+import { StatCard } from "./StatCard";
 
 export const AdminDashboard = () => {
   const { user, logout } = useAuthStore();
@@ -51,69 +52,39 @@ export const AdminDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-card rounded-lg shadow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Users className="text-primary" size={24} />
-                <h2 className="text-xl font-semibold text-card-foreground">
-                  User Management
-                </h2>
-              </div>
-              <div className="space-y-2">
-                <p className="text-muted-foreground">
-                  Total Users: {stats?.data.totalUsers || 0}
-                </p>
-                <p className="text-muted-foreground">
-                  Active Users: {stats?.data.activeUsers || 0}
-                </p>
-              </div>
-            </div>
+            <StatCard title="User Management" Icon={Users}>
+              <p className="text-muted-foreground">
+                Total Users: {stats?.data.totalUsers || 0}
+              </p>
+              <p className="text-muted-foreground">
+                Active Users: {stats?.data.activeUsers || 0}
+              </p>
+            </StatCard>
 
-            <div className="bg-card rounded-lg shadow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Activity className="text-primary" size={24} />
-                <h2 className="text-xl font-semibold text-card-foreground">
-                  System Status
-                </h2>
-              </div>
-              <div className="space-y-2">
-                <p className="text-muted-foreground">
-                  API Status: {stats?.data.systemHealth.apiStatus || "Unknown"}
-                </p>
-                <p className="text-muted-foreground">
-                  Last Check: {stats?.data.systemHealth.lastCheck || "Never"}
-                </p>
-              </div>
-            </div>
+            <StatCard title="System Status" Icon={Activity}>
+              <p className="text-muted-foreground">
+                API Status: {stats?.data.systemHealth.apiStatus || "Unknown"}
+              </p>
+              <p className="text-muted-foreground">
+                Last Check: {stats?.data.systemHealth.lastCheck || "Never"}
+              </p>
+            </StatCard>
 
-            <div className="bg-card rounded-lg shadow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Settings className="text-primary" size={24} />
-                <h2 className="text-xl font-semibold text-card-foreground">
-                  System Configuration
-                </h2>
-              </div>
-              <div className="space-y-2">
-                <p className="text-muted-foreground">
-                  Average Response Time:{" "}
-                  {stats?.data.performanceMetrics.averageResponseTime || 0}ms
-                </p>
-                <p className="text-muted-foreground">
-                  Uptime: {stats?.data.performanceMetrics.uptime || 0}%
-                </p>
-              </div>
-            </div>
+            <StatCard title="System Configuration" Icon={Settings}>
+              <p className="text-muted-foreground">
+                Average Response Time:{" "}
+                {stats?.data.performanceMetrics.averageResponseTime || 0}ms
+              </p>
+              <p className="text-muted-foreground">
+                Uptime: {stats?.data.performanceMetrics.uptime || 0}%
+              </p>
+            </StatCard>
 
-            <div className="bg-card rounded-lg shadow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <BarChart className="text-primary" size={24} />
-                <h2 className="text-xl font-semibold text-card-foreground">
-                  Analytics
-                </h2>
-              </div>
+            <StatCard title="Analytics" Icon={BarChart}>
               <p className="text-muted-foreground">
                 System Performance Overview
               </p>
-            </div>
+            </StatCard>
           </div>
         </div>
       </main>

@@ -1,13 +1,27 @@
-import { LoginForm } from "../components/auth/LoginForm";
+import { useNavigate } from "react-router-dom";
+import { AuthForm } from "../components/auth/AuthForm";
+import { AuthLayout } from "../components/auth/AuthLayout";
+import { useAuth } from "../hooks/useAuth";
 
 export const LoginPage = () => {
+  const navigate = useNavigate();
+  const { login, isLoading, error } = useAuth();
+
+  const handleLogin = async (data: { email: string; password: string }) => {
+    const success = await login(data.email, data.password);
+    if (success) {
+      navigate("/dashboard");
+    }
+  };
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <div className="container flex items-center justify-center mx-auto">
-        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-sm">
-          <LoginForm />
-        </div>
-      </div>
-    </div>
+    <AuthLayout title="Welcome Back">
+      <AuthForm
+        type="login"
+        onSubmit={handleLogin}
+        isLoading={isLoading}
+        error={error}
+      />
+    </AuthLayout>
   );
 };

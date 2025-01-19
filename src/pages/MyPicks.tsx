@@ -1,107 +1,54 @@
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Activity, TrendingUp } from "lucide-react";
-import PicksList from "../components/picks/PicksList";
-import ParlayList from "../components/picks/ParlayList";
-import { usePicks } from "../hooks/usePicks";
-import { calculateCategorySuccess } from "../utils/stats-utils";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUserPicks, deletePick } from "../services/api";
+import { PickCard } from "../components/picks/PickCard";
+import { PicksFilter } from "../components/picks/PicksFilter";
+import { LoadingState } from "../components/common/LoadingState";
 
-export default function MyPicks() {
-  const navigate = useNavigate();
-  const { singles, parlays, isLoading, deletePick } = usePicks();
+const MyPicks = () => {
+  const [activeFilter, setActiveFilter] = useState("all");
+  const queryClient = useQueryClient();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const { data: picks, isLoading } = useQuery({
+    queryKey: ["picks"],
+    queryFn: getUserPicks,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePick,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["picks"] });
+    },
+  });
+
+  if (isLoading) return <LoadingState message="Loading picks..." />;
+
+  const filteredPicks = picks?.data.filter((pick) => {
+    if (activeFilter === "active") return !pick.result;
+    if (activeFilter === "completed") return pick.result;
+    return true;
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center mb-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="mr-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </button>
-        <h1 className="text-2xl font-bold">My Picks</h1>
-      </div>
+      <h1 className="text-2xl font-bold mb-6">My Picks</h1>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-6 gap-4 mb-8">
-        {/* Primary Stats */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-          <div className="flex items-center gap-3">
-            <Activity className="text-green-500" size={24} />
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Overall Success
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {calculateCategorySuccess(singles, parlays, "POINTS")}%
-              </p>
-            </div>
-          </div>
-        </div>
+      <PicksFilter
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="text-blue-500" size={24} />
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Total Picks
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {singles.length + parlays.length}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Category Stats */}
-        {[
-          {
-            name: "POINTS",
-            icon: (props) => (
-              <TrendingUp {...props} className="text-purple-500" />
-            ),
-          },
-          {
-            name: "ASSISTS",
-            icon: (props) => (
-              <Activity {...props} className="text-indigo-500" />
-            ),
-          },
-          {
-            name: "REBOUNDS",
-            icon: (props) => (
-              <TrendingUp {...props} className="text-pink-500" />
-            ),
-          },
-        ].map(({ name, icon: Icon }) => (
-          <div
-            key={name}
-            className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow"
-          >
-            <div className="flex items-center gap-3">
-              <Icon size={24} />
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {name}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {calculateCategorySuccess(singles, parlays, name)}%
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filteredPicks?.map((pick) => (
+          <PickCard
+            key={pick.id}
+            pick={pick}
+            onDelete={() => deleteMutation.mutate(pick.id)}
+          />
         ))}
-      </div>
-
-      {/* Lists */}
-      <div className="space-y-8">
-        <PicksList picks={singles} onDelete={deletePick} />
-        <ParlayList parlays={parlays} onDelete={deletePick} />
       </div>
     </div>
   );
-}
+};
+
+export default MyPicks;
