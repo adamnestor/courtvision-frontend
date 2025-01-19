@@ -1,4 +1,6 @@
 import { PickResponse } from "../../types/api";
+import { cn } from "../../lib/utils";
+import { InfoCircle, Tooltip } from "@/components/icons";
 
 interface PickCardProps {
   pick: PickResponse;
@@ -7,6 +9,8 @@ interface PickCardProps {
 }
 
 export const PickCard = ({ pick, onDelete, isDeleting }: PickCardProps) => {
+  const { hitRate, confidenceScore } = pick;
+
   return (
     <div className="bg-card rounded-lg shadow p-4">
       <div className="flex justify-between items-start">
@@ -25,18 +29,28 @@ export const PickCard = ({ pick, onDelete, isDeleting }: PickCardProps) => {
         </button>
       </div>
       <div className="mt-2">
-        <p className="text-sm">
-          {pick.category} {pick.threshold} ({pick.hitRateAtPick}%)
-        </p>
-        {pick.result && (
-          <span
-            className={`text-sm ${
-              pick.result === "WIN" ? "text-success" : "text-destructive"
-            }`}
-          >
-            {pick.result}
-          </span>
-        )}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Hit Rate:</span>
+            <span className="text-sm">{hitRate.toFixed(1)}%</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Confidence:</span>
+            <span
+              className={cn(
+                "text-sm",
+                confidenceScore >= 80 && "text-success font-medium",
+                confidenceScore >= 60 && confidenceScore < 80 && "text-warning",
+                confidenceScore < 60 && "text-muted-foreground"
+              )}
+            >
+              {confidenceScore}
+            </span>
+            <Tooltip content="Confidence score based on recent performance, matchup, and historical data">
+              <InfoCircle className="w-4 h-4 text-muted-foreground" />
+            </Tooltip>
+          </div>
+        </div>
       </div>
       <div className="mt-2">
         {pick.result === null && (

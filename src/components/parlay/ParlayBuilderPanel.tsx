@@ -66,8 +66,8 @@ export const ParlayBuilderPanel = () => {
               <div className="flex-1">
                 <div className="font-medium">{pick.playerName}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {pick.threshold}+ {pick.category.toLowerCase()} {pick.hitRate}
-                  %
+                  {pick.threshold}+ {pick.category.toLowerCase()}({pick.hitRate}
+                  % | Confidence: {pick.confidenceScore})
                 </div>
                 <div className="text-xs text-gray-400 dark:text-gray-500">
                   {pick.team} {pick.opponent}

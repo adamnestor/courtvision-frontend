@@ -35,6 +35,7 @@ export interface PickResponse {
   opponent: string;
   result?: "WIN" | "LOSS";
   createdAt: string;
+  confidenceScore: number;
 }
 
 export interface AdminStatsResponse {
@@ -55,4 +56,8 @@ export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
   timestamp: string;
+}
+
+export interface PlayerStatsResponse {
+  confidenceScore: number;
 }

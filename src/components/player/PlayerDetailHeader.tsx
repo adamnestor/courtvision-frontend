@@ -56,6 +56,10 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
           <p className="text-muted-foreground">
             {player.teamAbbreviation} • {player.position}
           </p>
+          <div className="flex items-center gap-4">
+            <div>Hit Rate: {stats.hitRate}%</div>
+            <div>Confidence: {stats.confidenceScore}</div>
+          </div>
         </div>
         <div className="flex gap-2">
           <button

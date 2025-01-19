@@ -158,4 +158,26 @@ describe("StatsTable", () => {
     fireEvent.mouseLeave(firstRow);
     expect(firstRow).not.toHaveClass("hover:bg-muted/50");
   });
+
+  it("renders confidence scores correctly", () => {
+    const mockStatsWithConfidence = [
+      {
+        ...mockStats[0],
+        confidenceScore: 85, // High confidence
+      },
+      {
+        ...mockStats[1],
+        confidenceScore: 65, // Medium confidence
+      },
+    ];
+
+    render(<StatsTable stats={mockStatsWithConfidence} isLoading={false} />);
+
+    // Check if confidence scores are displayed
+    expect(screen.getByText("85")).toHaveClass("text-success");
+    expect(screen.getByText("65")).toHaveClass("text-warning");
+
+    // Check for tooltip
+    expect(screen.getAllByTestId("info-icon")).toHaveLength(2);
+  });
 });
