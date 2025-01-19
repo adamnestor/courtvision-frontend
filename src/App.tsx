@@ -18,11 +18,13 @@ import { NotificationList } from "./components/NotificationList";
 import { useAuthStore } from "./hooks/useAuthStore";
 import { useAppSettings } from "./hooks/useAppSettings";
 import { ErrorBoundary } from "./components/error/ErrorBoundary";
+import { useSessionTimeout } from "./hooks/useSessionTimeout";
 
 function App() {
   useAuthPersistence();
   useThemePersistence();
   useApiErrorHandler();
+  useSessionTimeout();
   const { isLoading, loadingMessage } = useLoadingState();
   const { compactView } = useUserPreferences();
   const { isLoading: authLoading } = useAuthStore();

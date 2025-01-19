@@ -12,8 +12,15 @@ import { toast } from "react-hot-toast";
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
+  timeout: 10000, // 10 seconds timeout
+  raxConfig: {
+    retry: 3,
+    retryDelay: 3000,
+    statusCodesToRetry: [[408, 429, 500, 502, 503, 504]],
+  },
   headers: {
     "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
   },
 });
 
@@ -57,8 +64,6 @@ api.interceptors.request.use(
     const user = authService.getCurrentUser();
     if (user?.token) {
       config.headers["Authorization"] = `Bearer ${user.token}`;
-      // For debugging
-      console.log("Adding token to request:", config.headers.Authorization);
     }
     return config;
   },
@@ -72,7 +77,6 @@ api.interceptors.response.use(
     const cacheControl = response.headers["cache-control"];
     if (cacheControl) {
       // React Query will respect these cache settings
-      console.log("Cache-Control:", cacheControl);
     }
     return response;
   },

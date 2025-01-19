@@ -1,4 +1,7 @@
 import axios from "axios";
+import { RateLimiter } from "../utils/rateLimiter";
+import { secureStorage } from "../utils/secureStorage";
+import { isTokenExpired } from "../utils/tokenUtils";
 
 interface LoginRequest {
   email: string;
@@ -19,11 +22,18 @@ interface AuthResponse {
 
 const API_URL = "http://localhost:8080/api/auth";
 
+const refreshRateLimiter = new RateLimiter(10, 60 * 1000); // 10 refreshes per minute
+
 export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const response = await axios.post(`${API_URL}/login`, credentials);
+    const response = await axios.post(`${API_URL}/login`, credentials, {
+      headers: {
+        "Cache-Control": "no-store",
+        Pragma: "no-cache",
+      },
+    });
     if (response.data.token) {
-      localStorage.setItem("user", JSON.stringify(response.data));
+      secureStorage.set("user", response.data);
     }
     return response.data;
   },
@@ -34,15 +44,42 @@ export const authService = {
   },
 
   logout() {
-    localStorage.removeItem("user");
+    secureStorage.remove("user");
   },
 
   getCurrentUser(): AuthResponse | null {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      return JSON.parse(userStr);
+    const user = secureStorage.get("user");
+    if (user?.token && isTokenExpired(user.token)) {
+      this.logout();
+      return null;
     }
-    return null;
+    return user;
+  },
+
+  async refreshToken(): Promise<AuthResponse> {
+    if (!refreshRateLimiter.canMakeRequest()) {
+      throw new Error("Too many refresh attempts. Please login again.");
+    }
+
+    const user = this.getCurrentUser();
+    if (!user?.token) throw new Error("No refresh token available");
+
+    const response = await axios.post(
+      `${API_URL}/refresh`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Cache-Control": "no-store",
+          Pragma: "no-cache",
+        },
+      }
+    );
+
+    if (response.data.token) {
+      secureStorage.set("user", response.data);
+    }
+    return response.data;
   },
 };
 
