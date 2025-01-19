@@ -2,8 +2,9 @@ import { PickCategory } from "./parlay";
 
 export interface ApiResponse<T> {
   data: T;
-  error?: string;
+  status: number;
   message?: string;
+  timestamp: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -34,4 +35,24 @@ export interface PickResponse {
   opponent: string;
   result?: "WIN" | "LOSS";
   createdAt: string;
+}
+
+export interface AdminStatsResponse {
+  totalUsers: number;
+  activeUsers: number;
+  systemHealth: {
+    apiStatus: "healthy" | "degraded" | "down";
+    lastCheck: string;
+  };
+  performanceMetrics: {
+    averageResponseTime: number;
+    uptime: number;
+  };
+}
+
+export interface ErrorResponse {
+  status: number;
+  message: string;
+  errors?: Record<string, string[]>;
+  timestamp: string;
 }

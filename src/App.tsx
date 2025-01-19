@@ -17,6 +17,7 @@ import { LoadingOverlay } from "./components/LoadingOverlay";
 import { NotificationList } from "./components/NotificationList";
 import { useAuthStore } from "./hooks/useAuthStore";
 import { useAppSettings } from "./hooks/useAppSettings";
+import { ErrorBoundary } from "./components/error/ErrorBoundary";
 
 function App() {
   useAuthPersistence();
@@ -39,33 +40,35 @@ function App() {
   }
 
   return (
-    <AppProvider>
-      <div className={layoutClass}>
-        <BrowserRouter>
-          {isLoading && <LoadingOverlay message={loadingMessage} />}
-          <NotificationList />
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+    <ErrorBoundary>
+      <AppProvider>
+        <div className={layoutClass}>
+          <BrowserRouter>
+            {isLoading && <LoadingOverlay message={loadingMessage} />}
+            <NotificationList />
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/player/:playerId" element={<PlayerDetail />} />
-              <Route path="/picks" element={<MyPicks />} />
-            </Route>
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/player/:playerId" element={<PlayerDetail />} />
+                <Route path="/picks" element={<MyPicks />} />
+              </Route>
 
-            {/* Admin Routes */}
-            <Route element={<AdminRoute />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Route>
+              {/* Admin Routes */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              </Route>
 
-            {/* Default redirect */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </div>
-    </AppProvider>
+              {/* Default redirect */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </AppProvider>
+    </ErrorBoundary>
   );
 }
 

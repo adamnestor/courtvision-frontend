@@ -1,6 +1,12 @@
 import axios, { AxiosError } from "axios";
 import { authService } from "./authService";
-import { ApiResponse, CreatePickRequest, PickResponse } from "../types/api";
+import {
+  ApiResponse,
+  CreatePickRequest,
+  PickResponse,
+  ErrorResponse,
+} from "../types/api";
+import { isApiResponse, isPickResponse } from "../utils/type-guards";
 import { toast } from "react-hot-toast";
 
 export const api = axios.create({
@@ -12,13 +18,26 @@ export const api = axios.create({
 });
 
 export class ApiError extends Error {
-  constructor(message: string, public status?: number, public code?: string) {
+  constructor(
+    message: string,
+    public status?: number,
+    public code?: string,
+    public errors?: Record<string, string[]>
+  ) {
     super(message);
     this.name = "ApiError";
   }
 }
 
-const handleError = (error: AxiosError) => {
+const handleError = (error: AxiosError<ErrorResponse>) => {
+  if (error.response?.data && !isErrorResponse(error.response.data)) {
+    console.error(
+      "Received invalid error response format",
+      error.response.data
+    );
+    throw new Error("Invalid error response format from server");
+  }
+
   if (error.response?.status === 401) {
     // Handle unauthorized
     authService.logout();
@@ -27,8 +46,10 @@ const handleError = (error: AxiosError) => {
   }
 
   const message = error.response?.data?.message || "An error occurred";
+  const errors = error.response?.data?.errors;
+
   toast.error(message);
-  throw new ApiError(message, error.response?.status);
+  throw new ApiError(message, error.response?.status, undefined, errors);
 };
 
 api.interceptors.request.use(
@@ -61,12 +82,13 @@ api.interceptors.response.use(
 export const createSinglePick = async (
   data: CreatePickRequest
 ): Promise<ApiResponse<PickResponse>> => {
-  console.log("Sending pick request:", data);
-  console.log("Current auth token:", authService.getCurrentUser()?.token);
   const response = await api.post<ApiResponse<PickResponse>>("/picks", {
     ...data,
     isParlay: false,
   });
+  if (!isApiResponse(response.data, isPickResponse)) {
+    throw new Error("Invalid pick response format from server");
+  }
   return response.data;
 };
 
@@ -77,21 +99,41 @@ export const createParlay = async (
     "/picks/parlay",
     picks
   );
+  if (
+    !isApiResponse(response.data, (data): data is PickResponse[] => {
+      return Array.isArray(data) && data.every(isPickResponse);
+    })
+  ) {
+    throw new Error("Invalid parlay response format from server");
+  }
   return response.data;
 };
 
 export const getUserPicks = async () => {
   const response = await api.get<ApiResponse<PickResponse>>("/picks");
+  if (!isApiResponse(response.data, isPickResponse)) {
+    throw new Error("Invalid pick response format from server");
+  }
   return response;
 };
 
 export const deletePick = async (id: number): Promise<ApiResponse<void>> => {
   const response = await api.delete<ApiResponse<void>>(`/picks/${id}`);
+  if (
+    !isApiResponse(response.data, (data): data is void => data === undefined)
+  ) {
+    throw new Error("Invalid delete response format from server");
+  }
   return response.data;
 };
 
 export const deleteParlay = async (id: string): Promise<ApiResponse<void>> => {
   const response = await api.delete<ApiResponse<void>>(`/picks/parlay/${id}`);
+  if (
+    !isApiResponse(response.data, (data): data is void => data === undefined)
+  ) {
+    throw new Error("Invalid delete response format from server");
+  }
   return response.data;
 };
 

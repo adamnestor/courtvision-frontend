@@ -60,10 +60,10 @@ export const AdminDashboard = () => {
               </div>
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  Total Users: {stats?.totalUsers || 0}
+                  Total Users: {stats?.data.totalUsers || 0}
                 </p>
                 <p className="text-muted-foreground">
-                  Active Users: {stats?.activeUsers || 0}
+                  Active Users: {stats?.data.activeUsers || 0}
                 </p>
               </div>
             </div>
@@ -77,10 +77,10 @@ export const AdminDashboard = () => {
               </div>
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  API Status: {stats?.systemHealth.apiStatus || "Unknown"}
+                  API Status: {stats?.data.systemHealth.apiStatus || "Unknown"}
                 </p>
                 <p className="text-muted-foreground">
-                  Last Check: {stats?.systemHealth.lastCheck || "Never"}
+                  Last Check: {stats?.data.systemHealth.lastCheck || "Never"}
                 </p>
               </div>
             </div>
@@ -95,10 +95,10 @@ export const AdminDashboard = () => {
               <div className="space-y-2">
                 <p className="text-muted-foreground">
                   Average Response Time:{" "}
-                  {stats?.performanceMetrics.averageResponseTime || 0}ms
+                  {stats?.data.performanceMetrics.averageResponseTime || 0}ms
                 </p>
                 <p className="text-muted-foreground">
-                  Uptime: {stats?.performanceMetrics.uptime || 0}%
+                  Uptime: {stats?.data.performanceMetrics.uptime || 0}%
                 </p>
               </div>
             </div>
