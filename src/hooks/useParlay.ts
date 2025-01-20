@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createParlay } from "../services/api";
 import { toast } from "react-hot-toast";
 import { ParlayPick } from "../types/parlay";
-import { useParlayBuilder } from "../context/ParlayBuilderContext";
+import { useParlayBuilder } from "../context/parlay-builder-context";
 
 export function useParlay() {
   const queryClient = useQueryClient();

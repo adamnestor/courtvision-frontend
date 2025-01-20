@@ -10,16 +10,22 @@ export function usePicks() {
     UserPickDTO[]
   >({
     queryKey: ["singles"],
-    queryFn: () => picksService.getSingles(),
+    queryFn: async () => {
+      const response = await picksService.getUserPicks();
+      return response?.singles ?? [];
+    },
   });
 
   const { data: parlays = [], isLoading: parlaysLoading } = useQuery<Parlay[]>({
     queryKey: ["parlays"],
-    queryFn: () => picksService.getParlays(),
+    queryFn: async () => {
+      const response = await picksService.getUserPicks();
+      return response?.parlays ?? [];
+    },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (pickId: string) => picksService.deletePick(pickId),
+    mutationFn: (pickId: number) => picksService.deletePick(pickId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["singles"] });
       queryClient.invalidateQueries({ queryKey: ["parlays"] });

@@ -21,7 +21,8 @@ export const useFilters = create<FiltersState>((set) => ({
     })),
   removeFilter: (key) =>
     set((state) => {
-      const { [key]: _, ...rest } = state.filters;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [key]: removed, ...rest } = state.filters;
       return {
         filters: rest,
         activeFilters: state.activeFilters.filter((k) => k !== key),

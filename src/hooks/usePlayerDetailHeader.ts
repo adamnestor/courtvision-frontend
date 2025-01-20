@@ -16,6 +16,7 @@ export function usePlayerDetailHeader(playerId: number) {
         playerId,
         ...data,
         isParlay: false,
+        hitRateAtPick: data.hitRate,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["picks"] });

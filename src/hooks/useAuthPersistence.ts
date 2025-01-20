@@ -8,9 +8,9 @@ export function useAuthPersistence() {
   useEffect(() => {
     const storedUser = authService.getCurrentUser();
     if (storedUser && !user) {
-      login(storedUser.email, storedUser.token);
+      login();
     }
-  }, []);
+  }, [user, login]);
 
   return { isInitialized: true };
 }

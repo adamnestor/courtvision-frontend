@@ -3,12 +3,6 @@ import api from "../services/api";
 import { Category, TimePeriod, Threshold } from "../types/dashboard";
 import { Stats } from "../types/stats";
 
-interface DashboardParams {
-  timePeriod: TimePeriod;
-  category: Category;
-  threshold: Threshold | null;
-}
-
 export const useDashboardStats = (params: {
   timePeriod: TimePeriod;
   category: Category;
@@ -22,13 +16,7 @@ export const useDashboardStats = (params: {
       params.threshold,
     ],
     queryFn: async () => {
-      const response = await api.get("/dashboard/stats", {
-        params: {
-          timePeriod: params.timePeriod,
-          category: params.category,
-          threshold: params.threshold,
-        },
-      });
+      const response = await api.get("/dashboard/stats", { params });
       return response.data.data;
     },
   });

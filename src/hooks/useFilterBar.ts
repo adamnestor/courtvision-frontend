@@ -4,7 +4,7 @@ import { Category, TimePeriod, Threshold } from "../types/dashboard";
 interface UseFilterBarProps {
   initialCategory?: Category;
   initialTimePeriod?: TimePeriod;
-  initialThreshold?: Threshold;
+  initialThreshold?: Threshold | null;
 }
 
 export function useFilterBar({

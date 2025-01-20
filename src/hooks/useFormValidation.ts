@@ -1,17 +1,22 @@
 import { create } from "zustand";
 
-interface ValidationState {
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-  isValid: boolean;
-  setFieldError: (field: string, error: string) => void;
-  setFieldTouched: (field: string, isTouched?: boolean) => void;
-  clearErrors: () => void;
-  validateField: (field: string, value: any) => Promise<boolean>;
-  validateForm: (values: Record<string, any>) => Promise<boolean>;
+interface ValidationError {
+  message: string;
+  type: string;
 }
 
-export const useFormValidation = create<ValidationState>((set, get) => ({
+interface ValidationState {
+  errors: Record<string, ValidationError>;
+  touched: Record<string, boolean>;
+  isValid: boolean;
+  setFieldError: (field: string, error: ValidationError) => void;
+  setFieldTouched: (field: string, isTouched?: boolean) => void;
+  clearErrors: () => void;
+  validateField: (field: string, value: unknown) => void;
+  validateForm: (values: Record<string, unknown>) => boolean;
+}
+
+export const useFormValidation = create<ValidationState>((set) => ({
   errors: {},
   touched: {},
   isValid: true,
@@ -25,12 +30,20 @@ export const useFormValidation = create<ValidationState>((set, get) => ({
       touched: { ...state.touched, [field]: isTouched },
     })),
   clearErrors: () => set({ errors: {}, isValid: true }),
-  validateField: async (field, value) => {
-    // Implement your validation logic here
-    return true;
+  validateField: (field: string) => {
+    set((state) => ({
+      errors: {
+        ...state.errors,
+        [field]: { message: "Invalid value", type: "error" },
+      },
+      touched: { ...state.touched, [field]: true },
+    }));
   },
-  validateForm: async (values) => {
-    // Implement your form validation logic here
-    return true;
+  validateForm: (values: Record<string, unknown>) => {
+    // Implement form validation logic
+    return Object.keys(values).every((key) => {
+      const value = values[key];
+      return value !== undefined && value !== null && value !== "";
+    });
   },
 }));
