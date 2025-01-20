@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/auth-context";
 import { DashboardHeader } from "./DashboardHeader";
 import { FilterBar } from "./FilterBar";
 import { StatsTable } from "./StatsTable";

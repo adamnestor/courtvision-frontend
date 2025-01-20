@@ -1,5 +1,5 @@
 import { XCircle, X, Trash2 } from "lucide-react";
-import { useParlayBuilder } from "../../context/ParlayBuilderContext";
+import { useParlayBuilder } from "../../context/parlay-builder-context";
 import { useParlay } from "../../hooks/useParlay";
 import { toast } from "react-hot-toast";
 import { ParlayPick } from "../../types/parlay";

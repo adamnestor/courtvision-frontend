@@ -1,7 +1,7 @@
 import { StatsRow } from "../../../types/dashboard";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle, ListPlus } from "lucide-react";
-import { useParlayBuilder } from "../../../context/ParlayBuilderContext";
+import { useParlayBuilder } from "../../../context/parlay-builder-context";
 import { v4 as uuidv4 } from "uuid";
 import { PickCategory } from "../../../types/parlay";
 import { toast } from "react-hot-toast";

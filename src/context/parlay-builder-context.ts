@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { ParlayPick } from "../types/parlay";
 
 export interface ParlayBuilderState {
@@ -16,3 +16,13 @@ export interface ParlayBuilderContextType {
 
 export const ParlayBuilderContext =
   createContext<ParlayBuilderContextType | null>(null);
+
+export const useParlayBuilder = () => {
+  const context = useContext(ParlayBuilderContext);
+  if (!context) {
+    throw new Error(
+      "useParlayBuilder must be used within a ParlayBuilderProvider"
+    );
+  }
+  return context;
+};

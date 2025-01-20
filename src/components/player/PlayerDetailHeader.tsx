@@ -1,5 +1,5 @@
 import { usePlayerDetailHeader } from "../../hooks/usePlayerDetailHeader";
-import { useParlayBuilder } from "../../context/ParlayBuilderContext";
+import { useParlayBuilder } from "../../context/parlay-builder-context";
 import { toast } from "react-hot-toast";
 import { PlayerDetailStats } from "../../types/player";
 import { PickCategory } from "../../types/parlay";

@@ -1,6 +1,6 @@
 import { QueryProvider } from "./QueryProvider";
 import { AuthProvider } from "./AuthProvider";
-import { ThemeProvider } from "./ThemeProvider";
+import { ThemeProvider } from "./theme-provider";
 import { ParlayBuilderProvider } from "./ParlayBuilderProvider";
 import { Toaster } from "react-hot-toast";
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "./useAuth";
+import { useAuth } from "../context/auth-context";
 import { authService } from "../services/authService";
 
 export function useAuthPersistence() {

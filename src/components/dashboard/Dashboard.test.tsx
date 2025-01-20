@@ -4,7 +4,7 @@ import { Dashboard } from "./Dashboard";
 import { useDashboardStats } from "../../hooks/useDashboardStats";
 import { renderWithProviders } from "../../test/test-utils";
 import { QueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { Stats } from "../../types/stats";
 
@@ -65,14 +65,14 @@ describe("Dashboard", () => {
     });
     vi.mocked(useAuth).mockReturnValue({
       user: {
+        id: 1,
         email: "test@example.com",
-        token: "mock-token",
-        role: "USER",
+        isAdmin: false,
       },
       isAuthenticated: true,
-      login: vi.fn(),
-      register: vi.fn(),
-      logout: vi.fn(),
+      isAdmin: false,
+      login: () => {},
+      logout: () => {},
     });
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
   });
@@ -81,9 +81,9 @@ describe("Dashboard", () => {
     vi.mocked(useAuth).mockReturnValue({
       user: null,
       isAuthenticated: false,
-      login: vi.fn(),
-      register: vi.fn(),
-      logout: vi.fn(),
+      isAdmin: false,
+      login: () => {},
+      logout: () => {},
     });
 
     renderWithProviders(<Dashboard />, { queryClient });
