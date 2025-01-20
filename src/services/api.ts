@@ -8,9 +8,10 @@ import {
 } from "../types/api";
 import { isApiResponse, isPickResponse } from "../utils/type-guards";
 import { toast } from "react-hot-toast";
+import { ENV } from "../utils/env";
 
 const config: CreateAxiosDefaults = {
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: ENV.API_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

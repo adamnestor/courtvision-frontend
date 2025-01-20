@@ -7,6 +7,7 @@ import { Category, TimePeriod, Threshold } from "../../types/dashboard";
 import { useDashboardStats } from "../../hooks/useDashboardStats";
 import { useNavigate } from "react-router-dom";
 import { Stats } from "../../types/stats";
+import { LoadingSpinner } from "../shared/LoadingSpinner";
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -15,7 +16,11 @@ export const Dashboard = () => {
   const [threshold, setThreshold] = useState<Threshold | null>(null);
   const navigate = useNavigate();
 
-  const { data: stats } = useDashboardStats({
+  const {
+    data: stats,
+    isLoading,
+    error,
+  } = useDashboardStats({
     timePeriod,
     category,
     threshold,
@@ -47,6 +52,40 @@ export const Dashboard = () => {
     averageHitRate:
       stats.reduce((sum, s) => sum + s.hitRate, 0) / stats.length || 0,
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Unable to load dashboard</h2>
+          <p className="text-muted-foreground">
+            {error instanceof Error ? error.message : "Please try again later"}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats?.length) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">No stats available</h2>
+          <p className="text-muted-foreground">
+            Check back later for updated statistics
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) return <div>Loading...</div>;
 

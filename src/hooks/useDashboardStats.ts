@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import api from "../services/api";
+import { api } from "../services/api";
 import { Category, TimePeriod, Threshold } from "../types/dashboard";
 import { Stats } from "../types/stats";
 

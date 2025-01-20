@@ -1,23 +1,10 @@
-import { useEffect } from "react";
-import { ThemeContext } from "./theme-context";
-import { useTheme } from "../hooks/useTheme";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { type ThemeProviderProps } from "next-themes/dist/types";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "dark" : "light");
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [setTheme]);
-
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <NextThemesProvider attribute="class" defaultTheme="system" {...props}>
       {children}
-    </ThemeContext.Provider>
+    </NextThemesProvider>
   );
 }

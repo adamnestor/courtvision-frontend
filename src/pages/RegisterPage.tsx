@@ -1,42 +1,89 @@
 import { useState } from "react";
 import { useAuth } from "../context/auth-context";
-import { useNavigate } from "react-router-dom";
-import { AuthForm } from "../components/auth/AuthForm";
-import { AuthLayout } from "../components/auth/AuthLayout";
-
-interface RegisterFormData {
-  email: string;
-  password: string;
-}
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export function RegisterPage() {
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const { register } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (data: RegisterFormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
     try {
-      setIsLoading(true);
-      setError(undefined);
-      await register(data.email, data.password);
+      await register(email, password);
       navigate("/dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      toast.error("Failed to register. Please try again.");
     }
   };
 
   return (
-    <AuthLayout title="Create Account">
-      {error && <div className="text-red-500">{error}</div>}
-      <AuthForm
-        type="register"
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-        error={error}
-      />
-    </AuthLayout>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="max-w-md w-full space-y-8 p-8 bg-card rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold text-center">Register</h2>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              className="input mt-1"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              className="input mt-1"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium"
+            >
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              required
+              className="input mt-1"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-full">
+            Register
+          </button>
+        </form>
+        <div className="text-center mt-4">
+          <p className="text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary hover:underline">
+              Login here
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,12 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     container: {
       center: true,
@@ -17,7 +12,11 @@ module.exports = {
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
+        border: {
+          DEFAULT: "hsl(var(--border))",
+          input: "hsl(var(--border-input))",
+        },
+        ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         success: {
@@ -52,6 +51,12 @@ module.exports = {
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
+      },
+      borderColor: {
+        input: "hsl(var(--border-input))",
+      },
+      ringColor: {
+        DEFAULT: "hsl(var(--ring))",
       },
     },
   },

@@ -1,32 +1,63 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { AuthContext } from "./auth-context";
+import { authService } from "../services/authService";
+import { User } from "../types/auth";
+import { useAuthStore } from "../hooks/useAuthStore";
 
-interface User {
-  id: number;
-  email: string;
-  isAdmin: boolean;
-}
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const { setIsAuthenticated, setIsLoading } = useAuthStore();
 
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    isAdmin: user?.isAdmin || false,
-    login: async () => {
-      // Implement login logic
-      setUser({ id: 1, email: "user@example.com", isAdmin: false });
-      return Promise.resolve();
-    },
-    logout: () => setUser(null),
-    register: async (email: string, password: string) => {
-      // Implement registration logic here
-      console.log(`Registering with password length: ${password.length}`);
-      setUser({ id: 1, email, isAdmin: false });
-      return Promise.resolve();
-    },
+  useEffect(() => {
+    setIsLoading(true);
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error("Auth initialization error:", error);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setIsAuthenticated, setIsLoading]);
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.login({ email, password });
+      setUser(response);
+      setIsAuthenticated(true);
+      return response;
+    } catch (error) {
+      console.error("Login error:", error);
+      setIsAuthenticated(false);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isAdmin: user?.role === "ADMIN",
+        login,
+        logout: () => {
+          authService.logout();
+          setUser(null);
+          setIsAuthenticated(false);
+        },
+        register: authService.register,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}

@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { AppProvider } from "./context/AppProvider";
 import { AdminRoute } from "./components/shared/AdminRoute";
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
@@ -9,7 +15,7 @@ import { AdminDashboard } from "./components/dashboard/AdminDashboard";
 import { PlayerDetail } from "./pages/PlayerDetail";
 import { MyPicks } from "./pages/MyPicks";
 import { useAuthPersistence } from "./hooks/useAuthPersistence";
-import { useThemePersistence } from "./hooks/useThemePersistence";
+import { useTheme } from "./hooks/useTheme";
 import { useApiErrorHandler } from "./hooks/useApiErrorHandler";
 import { useLoadingState } from "./hooks/useLoadingState";
 import { useUserPreferences } from "./hooks/useUserPreferences";
@@ -20,17 +26,19 @@ import { useAppSettings } from "./hooks/useAppSettings";
 import { ErrorBoundary } from "./components/error/ErrorBoundary";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
 
-function App() {
-  useAuthPersistence();
-  useThemePersistence();
-  useApiErrorHandler();
-  useSessionTimeout();
+// Create an AppRoutes component to use router-dependent hooks
+function AppRoutes() {
   const { isLoading, loadingMessage } = useLoadingState();
   const { compactView } = useUserPreferences();
-  const { isLoading: authLoading } = useAuthStore();
+  const { isLoading: authLoading, isAuthenticated } = useAuthStore();
   const { performance } = useAppSettings();
+  const { theme } = useTheme();
+  const location = useLocation();
 
-  // Apply performance settings
+  useAuthPersistence();
+  useApiErrorHandler();
+  useSessionTimeout();
+
   const layoutClass = [
     compactView ? "compact-layout" : "default-layout",
     performance.reducedMotion ? "reduce-motion" : "",
@@ -41,34 +49,46 @@ function App() {
     return <LoadingOverlay message="Initializing app..." />;
   }
 
+  const isAuthRoute = ["/login", "/register"].includes(location.pathname);
+  if (!isAuthenticated && !isAuthRoute) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <div className={`${layoutClass} ${theme}`}>
+      {isLoading && <LoadingOverlay message={loadingMessage} />}
+      <NotificationList />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/player/:playerId" element={<PlayerDetail />} />
+          <Route path="/picks" element={<MyPicks />} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route>
+
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </div>
+  );
+}
+
+// Main App component with providers
+function App() {
   return (
     <ErrorBoundary>
       <AppProvider>
-        <div className={layoutClass}>
-          <BrowserRouter>
-            {isLoading && <LoadingOverlay message={loadingMessage} />}
-            <NotificationList />
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/player/:playerId" element={<PlayerDetail />} />
-                <Route path="/picks" element={<MyPicks />} />
-              </Route>
-
-              {/* Admin Routes */}
-              <Route element={<AdminRoute />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              </Route>
-
-              {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
       </AppProvider>
     </ErrorBoundary>
   );

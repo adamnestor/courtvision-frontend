@@ -1,20 +1,20 @@
-import { QueryProvider } from "./QueryProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./AuthProvider";
-import { ThemeProvider } from "./theme-provider";
-import { ParlayBuilderProvider } from "./ParlayBuilderProvider";
+import { ThemeProvider } from "next-themes";
+import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+const queryClient = new QueryClient();
+
+export function AppProvider({ children }: { children: ReactNode }) {
   return (
-    <QueryProvider>
-      <AuthProvider>
-        <ThemeProvider>
-          <ParlayBuilderProvider>
-            {children}
-            <Toaster position="top-right" />
-          </ParlayBuilderProvider>
-        </ThemeProvider>
-      </AuthProvider>
-    </QueryProvider>
+    <ThemeProvider attribute="class" defaultTheme="system">
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          {children}
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

@@ -1,24 +1,9 @@
-import { useState, useEffect } from "react";
+import { useTheme as useNextTheme } from "next-themes";
 
-type Theme = "light" | "dark";
-
-export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("theme");
-    return (
-      (stored as Theme) ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light")
-    );
-  });
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  return { theme, setTheme };
-};
+export function useTheme() {
+  const { theme, setTheme } = useNextTheme();
+  return {
+    theme: theme as "light" | "dark" | "system",
+    setTheme,
+  };
+}

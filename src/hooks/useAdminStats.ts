@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import api from "../services/api";
+import { api } from "../services/api";
 import { ApiResponse, AdminStatsResponse, ErrorResponse } from "../types/api";
 import { isApiResponse, isAdminStatsResponse } from "../utils/type-guards";
 

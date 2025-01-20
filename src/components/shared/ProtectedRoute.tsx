@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/auth-context";
 import { ParlayBuilderPanel } from "../parlay/ParlayBuilderPanel";
 
 export const ProtectedRoute = () => {
