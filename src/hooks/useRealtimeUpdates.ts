@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 interface UpdateData {
@@ -7,10 +7,12 @@ interface UpdateData {
   timestamp: string;
 }
 
-export function useRealtimeUpdates(
+export const useRealtimeUpdates = (
   endpoint: string,
   onUpdate: (data: UpdateData) => void
-) {
+) => {
+  const [connected, setConnected] = useState(false);
+
   useEffect(() => {
     const socket: Socket = io(endpoint);
 
@@ -21,4 +23,6 @@ export function useRealtimeUpdates(
       socket.disconnect();
     };
   }, [endpoint, onUpdate]);
-}
+
+  return { connected };
+};

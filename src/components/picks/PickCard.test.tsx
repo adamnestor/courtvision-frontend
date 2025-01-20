@@ -6,76 +6,59 @@ import { QueryClient } from "@tanstack/react-query";
 
 describe("PickCard", () => {
   const mockPick = {
-    id: "1",
+    id: 123,
     playerId: 1,
     playerName: "LeBron James",
-    teamAbbreviation: "LAL",
-    opposingTeamAbbreviation: "GSW",
+    team: "LAL",
+    opponent: "GSW",
     category: "POINTS",
     threshold: 25,
     hitRate: 75.5,
     confidenceScore: 85,
-    status: "PENDING" as const,
-    gameTime: "2023-12-31T00:00:00Z",
+    result: null as "WIN" | "LOSS" | null,
+    gameTime: "2024-03-15T19:30:00Z",
   };
 
-  const mockOnDelete = vi.fn();
   const queryClient = new QueryClient();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+  it("renders basic pick details", () => {
+    renderWithProviders(<PickCard pick={mockPick} />, { queryClient });
+
+    expect(screen.getByText("LeBron James")).toBeInTheDocument();
+    expect(screen.getByText("LAL vs GSW")).toBeInTheDocument();
+    expect(screen.getByText("POINTS 25+")).toBeInTheDocument();
+    expect(screen.getByText("75.5%")).toBeInTheDocument();
+    expect(screen.getByText("Mar 15, 2024")).toBeInTheDocument();
   });
 
-  it("renders pick details correctly", () => {
-    render(<PickCard pick={mockPick} onDelete={() => {}} />);
+  it("shows result status with correct styling", () => {
+    renderWithProviders(<PickCard pick={{ ...mockPick, result: "WIN" }} />, {
+      queryClient,
+    });
 
-    expect(screen.getByText(mockPick.playerName)).toBeInTheDocument();
-    expect(screen.getByText(/POINTS/i)).toBeInTheDocument();
-    expect(screen.getByText(`${mockPick.threshold}`)).toBeInTheDocument();
-    expect(screen.getByText(`${mockPick.hitRate}%`)).toBeInTheDocument();
+    const status = screen.getByText("WIN");
+    expect(status).toBeInTheDocument();
+    expect(status).toHaveClass("text-success");
   });
 
-  it("shows success status when pick hits", () => {
-    render(
-      <PickCard pick={{ ...mockPick, status: "HIT" }} onDelete={() => {}} />
-    );
+  it("handles delete button interaction", () => {
+    const onDelete = vi.fn();
+    renderWithProviders(<PickCard pick={mockPick} onDelete={onDelete} />, {
+      queryClient,
+    });
 
-    const statusElement = screen.getByText(/hit/i);
-    expect(statusElement).toBeInTheDocument();
-    expect(statusElement).toHaveClass("text-success");
-  });
-
-  it("shows game information", () => {
-    render(<PickCard pick={mockPick} onDelete={() => {}} />);
-
-    expect(
-      screen.getByText(
-        `${mockPick.teamAbbreviation} vs ${mockPick.opposingTeamAbbreviation}`
-      )
-    ).toBeInTheDocument();
-    expect(screen.getByText("Dec 31, 2023")).toBeInTheDocument();
-  });
-
-  it("calls onDelete when delete button is clicked", async () => {
-    renderWithProviders(
-      <PickCard pick={mockPick} onDelete={mockOnDelete} isDeleting={false} />,
-      { queryClient }
-    );
-
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    const deleteButton = screen.getByRole("button");
     fireEvent.click(deleteButton);
-
-    expect(mockOnDelete).toHaveBeenCalledWith(mockPick.id);
+    expect(onDelete).toHaveBeenCalledWith("123");
   });
 
-  it("disables delete button when isDeleting is true", () => {
+  it("shows deleting state", () => {
     renderWithProviders(
-      <PickCard pick={mockPick} onDelete={mockOnDelete} isDeleting={true} />,
+      <PickCard pick={mockPick} onDelete={() => {}} isDeleting={true} />,
       { queryClient }
     );
 
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
-    expect(deleteButton).toBeDisabled();
-    expect(deleteButton).toHaveTextContent(/deleting/i);
+    expect(screen.getByText("Deleting...")).toBeInTheDocument();
+    expect(screen.getByRole("button")).toBeDisabled();
   });
 });

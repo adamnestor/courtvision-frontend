@@ -2,27 +2,29 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { PickResponse } from "../../types/picks";
 import { InfoCircle, Tooltip } from "../icons";
+import { Trash2 } from "lucide-react";
 
 interface PickCardProps {
   pick: PickResponse & {
     hitRate: number;
     gameTime: string;
+    category: string;
+    threshold: number;
   };
-  onDelete: (id: number) => void;
-  isDeleting: boolean;
+  onDelete?: (id: string) => void;
+  isDeleting?: boolean;
   className?: string;
 }
 
 export const PickCard = ({
   pick,
   onDelete,
-  isDeleting,
+  isDeleting = false,
   className,
 }: PickCardProps) => {
   const { hitRate, confidenceScore } = pick;
 
-  const isWin = pick.result === "WIN";
-  const isLoss = pick.result === "LOSS";
+  const formattedDate = format(new Date(pick.gameTime), "MMM d, yyyy");
 
   return (
     <div className={`bg-card rounded-lg shadow p-4 ${className || ""}`}>
@@ -32,17 +34,21 @@ export const PickCard = ({
           <p className="text-sm text-muted-foreground">
             {pick.team} vs {pick.opponent}
           </p>
+          <p className="text-sm">
+            {pick.category} {pick.threshold}+
+          </p>
+          <p className="text-sm text-muted-foreground">{formattedDate}</p>
         </div>
-        <button
-          disabled={isDeleting}
-          onClick={() => onDelete(pick.id)}
-          className="text-destructive hover:text-destructive/80"
-        >
-          {isDeleting ? "Deleting..." : "Delete"}
-        </button>
-      </div>
-      <div className="mt-2">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col items-end">
+          {pick.result && (
+            <span
+              className={`text-sm ${
+                pick.result === "WIN" ? "text-success" : "text-error"
+              }`}
+            >
+              {pick.result}
+            </span>
+          )}
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Hit Rate:</span>
             <span className="text-sm">{hitRate.toFixed(1)}%</span>
@@ -63,18 +69,17 @@ export const PickCard = ({
               <InfoCircle className="w-4 h-4 text-muted-foreground" />
             </Tooltip>
           </div>
+          {onDelete && (
+            <button
+              onClick={() => onDelete(pick.id.toString())}
+              disabled={isDeleting}
+              className="text-error hover:text-error/80 disabled:opacity-50"
+            >
+              {isDeleting ? "Deleting..." : <Trash2 size={16} />}
+            </button>
+          )}
         </div>
       </div>
-      <div className="mt-2">
-        {pick.result === null && (
-          <span className="text-yellow-500">Pending</span>
-        )}
-        {isWin && <span className="text-success">Hit</span>}
-        {isLoss && <span className="text-destructive">Miss</span>}
-      </div>
-      <p className="text-sm text-muted-foreground">
-        {format(new Date(pick.gameTime), "MMM d, yyyy")}
-      </p>
     </div>
   );
 };

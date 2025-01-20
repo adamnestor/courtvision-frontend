@@ -12,7 +12,9 @@ import { StatCard } from "./StatCard";
 export const AdminDashboard = () => {
   const { user, logout } = useAuthStore();
   const { refreshInterval, autoRefresh } = useAppSettings();
-  const { connected } = useRealtimeUpdates();
+  const { connected } = useRealtimeUpdates("admin", (data) => {
+    console.log("Received update:", data);
+  });
   const { showSidebar, tableCompact } = useDashboardLayout();
   const { data: stats, isLoading } = useAdminStats();
 
