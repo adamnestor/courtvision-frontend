@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PickCategory } from "../../../types/parlay";
 import { toast } from "react-hot-toast";
 import { createSinglePick } from "../../../services/api";
+import { ApiResponse, PickResponse } from "../../../types/api";
 
 interface StatsTableRowProps {
   stat: StatsRow;
@@ -52,7 +53,7 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
     const [category, thresholdStr] = stat.statLine.split(" ");
 
     try {
-      const response = await createSinglePick({
+      const response: ApiResponse<PickResponse> = await createSinglePick({
         playerId: stat.playerId,
         category: category.toUpperCase() as PickCategory,
         threshold: parseInt(thresholdStr),

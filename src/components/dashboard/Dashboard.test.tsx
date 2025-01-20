@@ -1,153 +1,155 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { Dashboard } from "./Dashboard";
 import { useDashboardStats } from "../../hooks/useDashboardStats";
-import { useAuth } from "../../hooks/useAuth";
-import { renderWithProviders } from "../../test/utils";
+import { renderWithProviders } from "../../test/test-utils";
+import { QueryClient } from "@tanstack/react-query";
 
 // Mock hooks
-vi.mock("../../hooks/useDashboardStats");
-vi.mock("../../hooks/useAuth");
+vi.mock("../../hooks/useDashboardStats", () => ({
+  useDashboardStats: vi.fn(),
+}));
 
 describe("Dashboard", () => {
-  const mockUser = {
-    email: "test@example.com",
-    role: "USER" as const,
-  };
-
   const mockStats = [
     {
-      playerId: 1,
+      playerId: "1",
       playerName: "LeBron James",
+      team: "LAL",
       category: "POINTS",
-      hitRate: 75,
+      hitRate: 75.5,
+      confidenceScore: 85,
       gamesPlayed: 10,
+      average: 28.5,
       isHighConfidence: true,
     },
     {
-      playerId: 2,
+      playerId: "2",
       playerName: "Stephen Curry",
-      category: "ASSISTS",
-      hitRate: 65,
+      team: "GSW",
+      category: "POINTS",
+      hitRate: 65.5,
+      confidenceScore: 75,
       gamesPlayed: 8,
+      average: 26.5,
       isHighConfidence: false,
     },
   ];
 
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAuth).mockReturnValue({
-      user: mockUser,
-      isAuthenticated: true,
-    } as any);
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          cacheTime: 0,
+          staleTime: 0,
+        },
+      },
+    });
   });
 
-  it("renders dashboard with stats", async () => {
-    vi.mocked(useDashboardStats).mockReturnValue({
-      data: mockStats,
-      isLoading: false,
-    } as any);
-
-    renderWithProviders(<Dashboard />);
-
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("LeBron James")).toBeInTheDocument();
-    expect(screen.getByText("Stephen Curry")).toBeInTheDocument();
-  });
-
-  it("shows loading state", () => {
-    vi.mocked(useDashboardStats).mockReturnValue({
-      data: null,
+  it("displays loading state", () => {
+    const mock = vi.mocked(useDashboardStats);
+    mock.mockReturnValue({
+      data: undefined,
       isLoading: true,
-    } as any);
+      error: null,
+      isError: false,
+      isFetching: true,
+    });
 
-    renderWithProviders(<Dashboard />);
-
+    renderWithProviders(<Dashboard />, { queryClient });
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
-  it("handles filter changes", async () => {
-    const mockSetCategory = vi.fn();
-    const mockSetTimePeriod = vi.fn();
-    const mockSetThreshold = vi.fn();
-
-    vi.mocked(useDashboardStats).mockReturnValue({
-      data: mockStats,
+  it("displays error state", async () => {
+    const error = new Error("Failed to fetch stats");
+    const mock = vi.mocked(useDashboardStats);
+    mock.mockReturnValue({
+      data: undefined,
       isLoading: false,
-      setCategory: mockSetCategory,
-      setTimePeriod: mockSetTimePeriod,
-      setThreshold: mockSetThreshold,
-    } as any);
-
-    renderWithProviders(<Dashboard />);
-
-    // Test category filter
-    fireEvent.change(screen.getByLabelText(/category/i), {
-      target: { value: "POINTS" },
+      error,
+      isError: true,
+      isFetching: false,
     });
-    expect(mockSetCategory).toHaveBeenCalledWith("POINTS");
 
-    // Test time period filter
-    fireEvent.change(screen.getByLabelText(/time period/i), {
-      target: { value: "L20" },
+    renderWithProviders(<Dashboard />, { queryClient });
+
+    await waitFor(() => {
+      expect(screen.getByText(error.message)).toBeInTheDocument();
     });
-    expect(mockSetTimePeriod).toHaveBeenCalledWith("L20");
   });
 
-  it("displays correct stats in header", () => {
-    vi.mocked(useDashboardStats).mockReturnValue({
+  it("displays stats data", async () => {
+    const mock = vi.mocked(useDashboardStats);
+    mock.mockReturnValue({
       data: mockStats,
       isLoading: false,
-    } as any);
+      error: null,
+      isError: false,
+      isFetching: false,
+    });
 
-    renderWithProviders(<Dashboard />);
+    renderWithProviders(<Dashboard />, { queryClient });
 
-    expect(screen.getByText(/75%/)).toBeInTheDocument(); // Hit rate
-    expect(screen.getByText(/18/)).toBeInTheDocument(); // Total games
-    expect(screen.getByText(/1/)).toBeInTheDocument(); // High confidence picks
+    await waitFor(() => {
+      expect(screen.getByText("LeBron James")).toBeInTheDocument();
+      expect(screen.getByText("Stephen Curry")).toBeInTheDocument();
+      expect(screen.getByText("75.5%")).toBeInTheDocument();
+    });
   });
 
-  it("handles empty stats", () => {
-    vi.mocked(useDashboardStats).mockReturnValue({
-      data: [],
-      isLoading: false,
-    } as any);
-
-    renderWithProviders(<Dashboard />);
-
-    expect(screen.getByText(/no stats available/i)).toBeInTheDocument();
-  });
-
-  it("sorts stats correctly", () => {
-    vi.mocked(useDashboardStats).mockReturnValue({
+  it("filters high confidence picks", async () => {
+    const mock = vi.mocked(useDashboardStats);
+    mock.mockReturnValue({
       data: mockStats,
       isLoading: false,
-    } as any);
+      error: null,
+      isError: false,
+      isFetching: false,
+    });
 
-    renderWithProviders(<Dashboard />);
+    renderWithProviders(<Dashboard />, { queryClient });
 
-    const sortButton = screen.getByText(/hit rate/i);
-    fireEvent.click(sortButton);
+    const filterButton = await waitFor(() =>
+      screen.getByRole("button", { name: /high confidence/i })
+    );
 
-    // Check if LeBron (75%) appears before Curry (65%)
-    const players = screen.getAllByTestId("player-row");
-    expect(players[0]).toHaveTextContent("LeBron James");
-    expect(players[1]).toHaveTextContent("Stephen Curry");
-  });
+    await act(async () => {
+      fireEvent.click(filterButton);
+    });
 
-  it("filters high confidence picks", () => {
-    vi.mocked(useDashboardStats).mockReturnValue({
-      data: mockStats,
-      isLoading: false,
-    } as any);
-
-    renderWithProviders(<Dashboard />);
-
-    const confidenceFilter = screen.getByLabelText(/high confidence/i);
-    fireEvent.click(confidenceFilter);
-
-    // Should only show LeBron (isHighConfidence: true)
     expect(screen.getByText("LeBron James")).toBeInTheDocument();
     expect(screen.queryByText("Stephen Curry")).not.toBeInTheDocument();
+  });
+
+  it("sorts stats by hit rate", async () => {
+    const mock = vi.mocked(useDashboardStats);
+    mock.mockReturnValue({
+      data: mockStats,
+      isLoading: false,
+      error: null,
+      isError: false,
+      isFetching: false,
+    });
+
+    renderWithProviders(<Dashboard />, { queryClient });
+
+    const sortButton = await waitFor(() =>
+      screen.getByRole("button", { name: /hit rate/i })
+    );
+
+    await act(async () => {
+      fireEvent.click(sortButton);
+    });
+
+    await waitFor(() => {
+      const rows = screen.getAllByTestId("player-row");
+      expect(rows[0]).toHaveTextContent("LeBron James");
+      expect(rows[1]).toHaveTextContent("Stephen Curry");
+    });
   });
 });

@@ -1,7 +1,8 @@
 import { PickCategory } from "./parlay";
 
 export interface ApiResponse<T> {
-  data: T;
+  data?: T;
+  error?: string;
   status: number;
   message?: string;
   timestamp: string;
