@@ -6,6 +6,7 @@ import { StatsTable } from "./StatsTable";
 import { Category, TimePeriod, Threshold } from "../../types/dashboard";
 import { useDashboardStats } from "../../hooks/useDashboardStats";
 import { useNavigate } from "react-router-dom";
+import { Stats } from "../../types/stats";
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export const Dashboard = () => {
   const [threshold, setThreshold] = useState<Threshold | null>(null);
   const navigate = useNavigate();
 
-  const { data: stats, isLoading } = useDashboardStats({
+  const { data: stats } = useDashboardStats({
     timePeriod,
     category,
     threshold,
@@ -33,11 +34,28 @@ export const Dashboard = () => {
     );
   };
 
+  const handleRowClick = (playerId: number) => {
+    navigate(`/player/${playerId}`);
+  };
+
+  const calculateSummary = (
+    stats: Stats.StatsRow[]
+  ): Stats.DashboardSummary => ({
+    availablePicks: stats.length,
+    highConfidencePicks: stats.filter((s) => s.isHighConfidence).length,
+    gamesCount: stats.reduce((max, s) => Math.max(max, s.gamesPlayed), 0),
+    averageHitRate:
+      stats.reduce((sum, s) => sum + s.hitRate, 0) / stats.length || 0,
+  });
+
   if (!user) return <div>Loading...</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <DashboardHeader title="Dashboard" stats={stats || []} />
+      <DashboardHeader
+        title="Dashboard"
+        stats={calculateSummary(stats || [])}
+      />
       <FilterBar
         timePeriod={timePeriod}
         category={category}
@@ -47,11 +65,7 @@ export const Dashboard = () => {
         onThresholdChange={setThreshold}
         availableCategories={["ALL", "POINTS", "ASSISTS", "REBOUNDS"]}
       />
-      <StatsTable
-        stats={stats || []}
-        isLoading={isLoading}
-        handleRowClick={(playerId) => navigate(`/player/${playerId}`)}
-      />
+      <StatsTable data={stats || []} onRowClick={handleRowClick} />
     </div>
   );
 };

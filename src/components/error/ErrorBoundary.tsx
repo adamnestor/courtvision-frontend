@@ -1,13 +1,12 @@
 import { Component, ErrorInfo, ReactNode } from "react";
-import { useErrorBoundary } from "../../hooks/useErrorBoundary";
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
+  error?: Error;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -15,38 +14,32 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false,
   };
 
-  public static getDerivedStateFromError(_: Error): State {
-    return { hasError: true };
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    useErrorBoundary.getState().setError(error, errorInfo);
+    console.error("Uncaught error:", error, errorInfo);
   }
 
   public render() {
     if (this.state.hasError) {
-      return this.props.fallback || <ErrorFallback />;
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+          <p className="text-muted-foreground mb-4">
+            {this.state.error?.message || "An error occurred"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
     }
 
     return this.props.children;
   }
 }
-
-const ErrorFallback = () => {
-  const { error, resetErrorBoundary } = useErrorBoundary();
-
-  return (
-    <div className="error-boundary p-4 border border-destructive rounded-md">
-      <h2 className="text-lg font-semibold text-destructive">
-        Something went wrong
-      </h2>
-      <pre className="mt-2 text-sm">{error?.message}</pre>
-      <button
-        onClick={resetErrorBoundary}
-        className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
-      >
-        Try again
-      </button>
-    </div>
-  );
-};

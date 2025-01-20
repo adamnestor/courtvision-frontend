@@ -13,7 +13,7 @@ import { useThemePersistence } from "./hooks/useThemePersistence";
 import { useApiErrorHandler } from "./hooks/useApiErrorHandler";
 import { useLoadingState } from "./hooks/useLoadingState";
 import { useUserPreferences } from "./hooks/useUserPreferences";
-import { LoadingOverlay } from "./components/LoadingOverlay";
+import { LoadingOverlay } from "./components/shared/LoadingOverlay";
 import { NotificationList } from "./components/NotificationList";
 import { useAuthStore } from "./hooks/useAuthStore";
 import { useAppSettings } from "./hooks/useAppSettings";

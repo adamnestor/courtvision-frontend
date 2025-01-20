@@ -12,6 +12,7 @@ export interface ParlayPick {
   threshold: number;
   hitRate: number;
   timestamp: string;
+  confidenceScore: number;
 }
 
 export interface ParlayBuilderState {

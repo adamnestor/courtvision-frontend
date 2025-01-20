@@ -17,3 +17,12 @@ export interface Parlay {
   result?: boolean;
   createdAt: string;
 }
+
+export interface PickResponse {
+  id: number;
+  playerName: string;
+  team: string;
+  opponent: string;
+  result: "WIN" | "LOSS" | null;
+  confidenceScore: number;
+}

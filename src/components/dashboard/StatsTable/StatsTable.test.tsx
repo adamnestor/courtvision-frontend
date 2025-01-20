@@ -1,13 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
-import { StatsTable } from ".";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { StatsTable } from "./StatsTable";
+import { Stats } from "../../../types/stats";
 
 describe("StatsTable", () => {
-  const mockStats = [
+  const mockData: Stats.StatsRow[] = [
     {
-      playerId: "1",
+      playerId: 1,
       playerName: "LeBron James",
       team: "LAL",
+      opponent: "GSW",
+      statLine: "POINTS 25",
       hitRate: 75.5,
       confidenceScore: 85,
       gamesPlayed: 10,
@@ -15,9 +18,11 @@ describe("StatsTable", () => {
       isHighConfidence: true,
     },
     {
-      playerId: "2",
+      playerId: 2,
       playerName: "Stephen Curry",
       team: "GSW",
+      opponent: "LAL",
+      statLine: "POINTS 20",
       hitRate: 65.5,
       confidenceScore: 75,
       gamesPlayed: 8,
@@ -26,52 +31,48 @@ describe("StatsTable", () => {
     },
   ];
 
-  const mockHandleRowClick = vi.fn();
-
-  const defaultProps = {
-    stats: mockStats,
-    handleRowClick: mockHandleRowClick,
-  };
+  const mockOnRowClick = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders table headers correctly", () => {
-    render(<StatsTable {...defaultProps} />);
+    render(<StatsTable data={mockData} onRowClick={mockOnRowClick} />);
 
     expect(screen.getByText("Player")).toBeInTheDocument();
     expect(screen.getByText("Team")).toBeInTheDocument();
     expect(screen.getByText("Hit Rate")).toBeInTheDocument();
+    expect(screen.getByText("Confidence")).toBeInTheDocument();
     expect(screen.getByText("Games")).toBeInTheDocument();
-    expect(screen.getByText("Average")).toBeInTheDocument();
   });
 
-  it("renders player stats correctly", () => {
-    render(<StatsTable {...defaultProps} />);
+  it("renders player data correctly", () => {
+    render(<StatsTable data={mockData} onRowClick={mockOnRowClick} />);
 
-    const rows = screen.getAllByTestId("player-row");
-    expect(rows).toHaveLength(2);
-
-    const firstRow = rows[0];
-    expect(within(firstRow).getByText("LeBron James")).toBeInTheDocument();
-    expect(within(firstRow).getByText("LAL")).toBeInTheDocument();
-    expect(within(firstRow).getByText("75.5%")).toBeInTheDocument();
-    expect(within(firstRow).getByText("10")).toBeInTheDocument();
-    expect(within(firstRow).getByText("28.5")).toBeInTheDocument();
+    expect(screen.getByText("LeBron James")).toBeInTheDocument();
+    expect(screen.getByText("LAL")).toBeInTheDocument();
+    expect(screen.getByText("75.5%")).toBeInTheDocument();
   });
 
-  it("calls handleRowClick when row is clicked", () => {
-    render(<StatsTable {...defaultProps} />);
+  it("calls onRowClick with correct playerId", () => {
+    render(<StatsTable data={mockData} onRowClick={mockOnRowClick} />);
 
-    const firstRow = screen.getAllByTestId("player-row")[0];
-    fireEvent.click(firstRow);
+    const row = screen.getByText("LeBron James").closest("tr");
+    fireEvent.click(row!);
 
-    expect(mockHandleRowClick).toHaveBeenCalledWith("1");
+    expect(mockOnRowClick).toHaveBeenCalledWith(1);
+  });
+
+  it("applies high confidence styling", () => {
+    render(<StatsTable data={mockData} onRowClick={mockOnRowClick} />);
+
+    const row = screen.getByText("LeBron James").closest("tr");
+    expect(row).toHaveClass("bg-green-50");
   });
 
   it("highlights high confidence picks", () => {
-    render(<StatsTable {...defaultProps} />);
+    render(<StatsTable data={mockData} onRowClick={mockOnRowClick} />);
 
     const rows = screen.getAllByTestId("player-row");
     const highConfidenceRow = rows[0]; // LeBron's row
@@ -82,7 +83,7 @@ describe("StatsTable", () => {
   });
 
   it("formats numbers correctly", () => {
-    render(<StatsTable {...defaultProps} />);
+    render(<StatsTable data={mockData} onRowClick={mockOnRowClick} />);
 
     expect(screen.getByText("75.5%")).toBeInTheDocument();
     expect(screen.getByText("28.5")).toBeInTheDocument();

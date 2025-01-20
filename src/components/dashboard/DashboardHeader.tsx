@@ -1,16 +1,11 @@
 import { useAuth } from "../../hooks/useAuth";
-import { ThemeToggle } from "../shared/ThemeToggle";
-import { LogoutButton } from "./LogoutButton";
-import { useNavigate } from "react-router-dom";
-import { History, Target, TrendingUp, CalendarDays } from "lucide-react";
-import { StatsRow } from "../../types/dashboard";
-import { calculateDashboardStats } from "../../utils/stats-utils";
+import { Stats } from "../../types/stats";
 
 interface DashboardHeaderProps {
   title?: string;
   subtitle?: string;
   actions?: React.ReactNode;
-  stats: StatsRow[];
+  stats: Stats.DashboardSummary;
 }
 
 export const DashboardHeader = ({
@@ -20,9 +15,6 @@ export const DashboardHeader = ({
   stats,
 }: DashboardHeaderProps) => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const { availablePicks, highConfidencePicks, gamesCount } =
-    calculateDashboardStats(stats);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -35,6 +27,11 @@ export const DashboardHeader = ({
         {subtitle && (
           <p className="text-sm text-muted-foreground">{subtitle}</p>
         )}
+        <div className="mt-2 text-sm text-muted-foreground">
+          Available Picks: {stats.availablePicks} | High Confidence:{" "}
+          {stats.highConfidencePicks} | Games: {stats.gamesCount} | Avg Hit
+          Rate: {stats.averageHitRate.toFixed(1)}%
+        </div>
       </div>
       {actions}
     </div>

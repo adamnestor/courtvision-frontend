@@ -1,9 +1,8 @@
 import { usePlayerDetailHeader } from "../../hooks/usePlayerDetailHeader";
 import { useParlayBuilder } from "../../context/ParlayBuilderContext";
-import { v4 as uuidv4 } from "uuid";
-import { PickCategory } from "../../types/parlay";
 import { toast } from "react-hot-toast";
 import { PlayerDetailStats } from "../../types/player";
+import { PickCategory } from "../../types/parlay";
 
 interface PlayerDetailHeaderProps {
   stats: PlayerDetailStats;
@@ -21,15 +20,16 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
     }
 
     addPick({
-      id: uuidv4(),
-      playerId: player.playerId,
-      playerName: `${player.firstName} ${player.lastName}`,
-      team: player.teamAbbreviation,
+      id: crypto.randomUUID(),
+      playerId: stats.player.playerId,
+      playerName: `${stats.player.firstName} ${stats.player.lastName}`,
+      team: stats.player.teamAbbreviation,
       opponent: stats.games[0]?.opponent || "",
-      category: summary.category as PickCategory,
-      threshold: summary.threshold,
-      hitRate: summary.hitRate,
+      category: stats.summary.category as PickCategory,
+      threshold: stats.threshold,
+      hitRate: stats.summary.hitRate,
       timestamp: new Date().toISOString(),
+      confidenceScore: stats.summary.confidenceScore || 0,
     });
   };
 
@@ -57,8 +57,8 @@ export const PlayerDetailHeader = ({ stats }: PlayerDetailHeaderProps) => {
             {player.teamAbbreviation} • {player.position}
           </p>
           <div className="flex items-center gap-4">
-            <div>Hit Rate: {stats.hitRate}%</div>
-            <div>Confidence: {stats.confidenceScore}</div>
+            <div>Hit Rate: {stats.summary.hitRate}%</div>
+            <div>Confidence: {stats.summary.confidenceScore}</div>
           </div>
         </div>
         <div className="flex gap-2">

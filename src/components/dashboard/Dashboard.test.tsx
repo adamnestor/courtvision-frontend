@@ -6,6 +6,7 @@ import { renderWithProviders } from "../../test/test-utils";
 import { QueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Stats } from "../../types/stats";
 
 // Mock hooks
 vi.mock("../../hooks/useDashboardStats", () => ({
@@ -23,7 +24,7 @@ vi.mock("react-router-dom", () => ({
 describe("Dashboard", () => {
   const mockStats = [
     {
-      playerId: "1",
+      playerId: 1,
       playerName: "LeBron James",
       team: "LAL",
       opponent: "GSW",
@@ -35,7 +36,7 @@ describe("Dashboard", () => {
       isHighConfidence: true,
     },
     {
-      playerId: "2",
+      playerId: 2,
       playerName: "Stephen Curry",
       team: "GSW",
       opponent: "LAL",
@@ -65,11 +66,13 @@ describe("Dashboard", () => {
     vi.mocked(useAuth).mockReturnValue({
       user: {
         email: "test@example.com",
-        id: "1",
         token: "mock-token",
         role: "USER",
       },
       isAuthenticated: true,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
     });
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
   });
@@ -78,12 +81,14 @@ describe("Dashboard", () => {
     vi.mocked(useAuth).mockReturnValue({
       user: null,
       isAuthenticated: false,
+      login: vi.fn(),
+      register: vi.fn(),
+      logout: vi.fn(),
     });
 
     renderWithProviders(<Dashboard />, { queryClient });
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
-
   it("displays loading state while fetching stats", () => {
     vi.mocked(useDashboardStats).mockReturnValue({
       data: undefined,
@@ -91,6 +96,26 @@ describe("Dashboard", () => {
       error: null,
       isError: false,
       isFetching: true,
+      isPending: true,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: false,
+      refetch: vi.fn(),
+      fetchStatus: "fetching",
+      status: "pending",
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isFetched: false,
+      isStale: false,
+      isPlaceholderData: false,
+      isPaused: false,
+      dataUpdatedAt: 0,
+      errorUpdatedAt: 0,
+      isFetchedAfterMount: false,
+      isInitialLoading: true,
+      isRefetching: false,
+      promise: Promise.resolve([] as Stats.StatsRow[]),
     });
 
     renderWithProviders(<Dashboard />, { queryClient });
@@ -104,6 +129,26 @@ describe("Dashboard", () => {
       error: null,
       isError: false,
       isFetching: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      refetch: vi.fn(),
+      fetchStatus: "idle",
+      status: "success",
+      isStale: false,
+      isPlaceholderData: false,
+      isPaused: false,
+      dataUpdatedAt: 0,
+      errorUpdatedAt: 0,
+      isFetchedAfterMount: false,
+      isInitialLoading: false,
+      isRefetching: false,
+      promise: Promise.resolve([] as Stats.StatsRow[]),
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isFetched: true,
     });
 
     renderWithProviders(<Dashboard />, { queryClient });
@@ -121,6 +166,26 @@ describe("Dashboard", () => {
       error: null,
       isError: false,
       isFetching: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      refetch: vi.fn(),
+      fetchStatus: "idle",
+      status: "success",
+      isStale: false,
+      isPlaceholderData: false,
+      isPaused: false,
+      dataUpdatedAt: 0,
+      errorUpdatedAt: 0,
+      isFetchedAfterMount: false,
+      isInitialLoading: false,
+      isRefetching: false,
+      promise: Promise.resolve([] as Stats.StatsRow[]),
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isFetched: true,
     });
 
     renderWithProviders(<Dashboard />, { queryClient });
@@ -132,13 +197,32 @@ describe("Dashboard", () => {
   });
 
   it("updates filters correctly", async () => {
-    const mockSetStats = vi.fn();
     vi.mocked(useDashboardStats).mockReturnValue({
       data: mockStats,
       isLoading: false,
       error: null,
       isError: false,
       isFetching: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      refetch: vi.fn(),
+      fetchStatus: "idle",
+      status: "success",
+      isStale: false,
+      isPlaceholderData: false,
+      isPaused: false,
+      dataUpdatedAt: 0,
+      errorUpdatedAt: 0,
+      isFetchedAfterMount: false,
+      isInitialLoading: false,
+      isRefetching: false,
+      promise: Promise.resolve([] as Stats.StatsRow[]),
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      isFetched: true,
     });
 
     renderWithProviders(<Dashboard />, { queryClient });

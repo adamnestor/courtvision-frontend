@@ -1,21 +1,14 @@
-import React from "react";
-import { cn } from "@/lib/utils";
-import { StatsRow } from "../../../types/dashboard";
+import { Stats } from "../../../types/stats";
 
 interface StatsTableProps {
-  stats: StatsRow[];
-  isLoading: boolean;
-  handleRowClick?: (playerId: string) => void;
+  data: Stats.StatsRow[];
+  onRowClick: (playerId: number) => void;
 }
 
-export const StatsTable: React.FC<StatsTableProps> = ({
-  stats,
-  isLoading,
-  handleRowClick,
-}) => {
+export const StatsTable = ({ data, onRowClick }: StatsTableProps) => {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left" data-testid="stats-table">
+      <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
             <th>Player</th>
@@ -26,23 +19,35 @@ export const StatsTable: React.FC<StatsTableProps> = ({
             <th>Average</th>
           </tr>
         </thead>
-        <tbody>
-          {stats.map((stat) => (
+        <tbody className="bg-white divide-y divide-gray-200">
+          {data.map((row) => (
             <tr
-              key={stat.playerId}
-              data-testid="player-row"
-              className={cn(
-                "hover:bg-muted cursor-pointer",
-                stat.isHighConfidence && "bg-success/10"
-              )}
-              onClick={() => handleRowClick && handleRowClick(stat.playerId)}
+              key={row.playerId}
+              onClick={() => onRowClick(row.playerId)}
+              className={`cursor-pointer hover:bg-gray-50 ${
+                row.isHighConfidence ? "bg-green-50" : ""
+              }`}
             >
-              <td>{stat.playerName}</td>
-              <td>{stat.team}</td>
-              <td>{stat.hitRate.toFixed(1)}%</td>
-              <td>{stat.confidenceScore}</td>
-              <td>{stat.gamesPlayed}</td>
-              <td>{stat.average.toFixed(1)}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm font-medium text-gray-900">
+                  {row.playerName}
+                </div>
+                <div className="text-sm text-gray-500">{row.team}</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-900">{row.statLine}</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-900">{row.hitRate}%</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-900">
+                  {row.confidenceScore}
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-900">{row.gamesPlayed}</div>
+              </td>
             </tr>
           ))}
         </tbody>

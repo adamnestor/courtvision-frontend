@@ -1,4 +1,4 @@
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
 
 interface LoadingOverlayProps {
   message?: string;

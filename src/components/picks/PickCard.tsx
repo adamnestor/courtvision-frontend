@@ -1,18 +1,31 @@
-import { PickResponse } from "../../types/api";
-import { cn } from "../../lib/utils";
-import { InfoCircle, Tooltip } from "@/components/icons";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { PickResponse } from "../../types/picks";
+import { InfoCircle, Tooltip } from "../icons";
 
 interface PickCardProps {
-  pick: PickResponse;
+  pick: PickResponse & {
+    hitRate: number;
+    gameTime: string;
+  };
   onDelete: (id: number) => void;
   isDeleting: boolean;
+  className?: string;
 }
 
-export const PickCard = ({ pick, onDelete, isDeleting }: PickCardProps) => {
+export const PickCard = ({
+  pick,
+  onDelete,
+  isDeleting,
+  className,
+}: PickCardProps) => {
   const { hitRate, confidenceScore } = pick;
 
+  const isWin = pick.result === "WIN";
+  const isLoss = pick.result === "LOSS";
+
   return (
-    <div className="bg-card rounded-lg shadow p-4">
+    <div className={`bg-card rounded-lg shadow p-4 ${className || ""}`}>
       <div className="flex justify-between items-start">
         <div>
           <h3 className="font-semibold">{pick.playerName}</h3>
@@ -56,13 +69,11 @@ export const PickCard = ({ pick, onDelete, isDeleting }: PickCardProps) => {
         {pick.result === null && (
           <span className="text-yellow-500">Pending</span>
         )}
-        {pick.result === true && <span className="text-success">Hit</span>}
-        {pick.result === false && (
-          <span className="text-destructive">Miss</span>
-        )}
+        {isWin && <span className="text-success">Hit</span>}
+        {isLoss && <span className="text-destructive">Miss</span>}
       </div>
       <p className="text-sm text-muted-foreground">
-        {new Date(pick.gameTime).toLocaleDateString()}
+        {format(new Date(pick.gameTime), "MMM d, yyyy")}
       </p>
     </div>
   );

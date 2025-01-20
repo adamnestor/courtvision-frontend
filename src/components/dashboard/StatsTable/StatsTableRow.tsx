@@ -45,6 +45,7 @@ export const StatsTableRow = ({ stat }: StatsTableRowProps) => {
       threshold: parseInt(thresholdStr),
       hitRate: stat.hitRate,
       timestamp: new Date().toISOString(),
+      confidenceScore: stat.confidenceScore || 0,
     });
   };
 

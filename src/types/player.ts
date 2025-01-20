@@ -35,6 +35,7 @@ export interface StatsSummary {
   threshold: number;
   timePeriod: TimePeriod;
   hitRate: number;
+  confidenceScore: number;
   average: number;
   successCount: number;
   failureCount: number;
@@ -46,4 +47,20 @@ export interface PlayerDetailStats {
   summary: StatsSummary;
   threshold: number;
   metrics: GameMetrics;
+}
+
+export interface GameResult {
+  id: number;
+  date: string;
+  opponent: string;
+  statValue: number;
+  hitThreshold: boolean;
+}
+
+export type Category = "POINTS" | "ASSISTS" | "REBOUNDS";
+
+export interface PlayerStats {
+  hitRate: number;
+  average: number;
+  gamesPlayed: number;
 }

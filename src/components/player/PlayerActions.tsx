@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Category } from "../../types/player";
+import { Category } from "../../types/dashboard";
 
 interface PlayerActionsProps {
   onCreatePick: (category: Category, threshold: number) => void;

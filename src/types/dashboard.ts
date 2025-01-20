@@ -10,4 +10,5 @@ export interface StatsRow {
   statLine: string;
   hitRate: number;
   average: number;
+  confidenceScore: number;
 }

@@ -1,31 +1,36 @@
-import { useNotifications } from "../../hooks/useNotifications";
-import { NotificationContainer } from "./NotificationContainer";
+import { useNotificationStore } from "../../stores/notificationStore";
 import { NotificationItem } from "./NotificationItem";
 import { AnimatePresence, motion } from "framer-motion";
+import { Notification } from "../../types/notifications";
 
 export const NotificationList = () => {
-  const { notifications, dismissNotification } = useNotifications();
-
-  if (notifications.length === 0) return null;
+  const { notifications, removeNotification } = useNotificationStore();
 
   return (
-    <NotificationContainer>
+    <div className="fixed top-4 right-4 z-50">
       <AnimatePresence>
-        {notifications.map((notification) => (
+        {notifications.map((notification: Notification) => (
           <motion.div
             key={notification.id}
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, x: 100 }}
             transition={{ duration: 0.2 }}
           >
             <NotificationItem
-              notification={notification}
-              onDismiss={dismissNotification}
+              notification={{
+                id: notification.id,
+                title: notification.title,
+                message: notification.message,
+                type: notification.type,
+                duration: notification.duration,
+                timestamp: notification.timestamp,
+              }}
+              onDismiss={() => removeNotification(notification.id)}
             />
           </motion.div>
         ))}
       </AnimatePresence>
-    </NotificationContainer>
+    </div>
   );
 };
