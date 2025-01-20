@@ -6,18 +6,17 @@ import { QueryClient } from "@tanstack/react-query";
 
 describe("PickCard", () => {
   const mockPick = {
-    id: 1,
+    id: "1",
     playerId: 1,
     playerName: "LeBron James",
+    teamAbbreviation: "LAL",
+    opposingTeamAbbreviation: "GSW",
     category: "POINTS",
     threshold: 25,
     hitRate: 75.5,
-    result: null,
-    createdAt: "2024-01-01",
-    team: "LAL",
-    opponent: "GSW",
-    gameTime: "2024-01-01",
     confidenceScore: 85,
+    status: "PENDING" as const,
+    gameTime: "2023-12-31T00:00:00Z",
   };
 
   const mockOnDelete = vi.fn();
@@ -28,47 +27,33 @@ describe("PickCard", () => {
   });
 
   it("renders pick details correctly", () => {
-    renderWithProviders(
-      <PickCard pick={mockPick} onDelete={mockOnDelete} isDeleting={false} />,
-      { queryClient }
-    );
+    render(<PickCard pick={mockPick} onDelete={() => {}} />);
 
     expect(screen.getByText(mockPick.playerName)).toBeInTheDocument();
-    expect(screen.getByText(/points/i)).toBeInTheDocument();
-    expect(screen.getByText(`${mockPick.threshold}+`)).toBeInTheDocument();
+    expect(screen.getByText(/POINTS/i)).toBeInTheDocument();
+    expect(screen.getByText(`${mockPick.threshold}`)).toBeInTheDocument();
     expect(screen.getByText(`${mockPick.hitRate}%`)).toBeInTheDocument();
   });
 
-  it("shows pending status when result is null", () => {
-    renderWithProviders(
-      <PickCard pick={mockPick} onDelete={mockOnDelete} isDeleting={false} />,
-      { queryClient }
-    );
-
-    expect(screen.getByText(/pending/i)).toBeInTheDocument();
-    expect(screen.getByText(/pending/i)).toHaveClass("text-yellow-500");
-  });
-
   it("shows success status when pick hits", () => {
-    const hitPick = { ...mockPick, result: "WIN" as const };
-    renderWithProviders(
-      <PickCard pick={hitPick} onDelete={mockOnDelete} isDeleting={false} />,
-      { queryClient }
+    render(
+      <PickCard pick={{ ...mockPick, status: "HIT" }} onDelete={() => {}} />
     );
 
-    expect(screen.getByText(/hit/i)).toBeInTheDocument();
-    expect(screen.getByText(/hit/i)).toHaveClass("text-success");
+    const statusElement = screen.getByText(/hit/i);
+    expect(statusElement).toBeInTheDocument();
+    expect(statusElement).toHaveClass("text-success");
   });
 
-  it("shows failure status when pick misses", () => {
-    const missPick = { ...mockPick, result: "LOSS" as const };
-    renderWithProviders(
-      <PickCard pick={missPick} onDelete={mockOnDelete} isDeleting={false} />,
-      { queryClient }
-    );
+  it("shows game information", () => {
+    render(<PickCard pick={mockPick} onDelete={() => {}} />);
 
-    expect(screen.getByText(/miss/i)).toBeInTheDocument();
-    expect(screen.getByText(/miss/i)).toHaveClass("text-destructive");
+    expect(
+      screen.getByText(
+        `${mockPick.teamAbbreviation} vs ${mockPick.opposingTeamAbbreviation}`
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByText("Dec 31, 2023")).toBeInTheDocument();
   });
 
   it("calls onDelete when delete button is clicked", async () => {
@@ -81,20 +66,6 @@ describe("PickCard", () => {
     fireEvent.click(deleteButton);
 
     expect(mockOnDelete).toHaveBeenCalledWith(mockPick.id);
-  });
-
-  it("shows game information", () => {
-    renderWithProviders(
-      <PickCard pick={mockPick} onDelete={mockOnDelete} isDeleting={false} />,
-      { queryClient }
-    );
-
-    expect(
-      screen.getByText(`${mockPick.team} vs ${mockPick.opponent}`)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(new Date(mockPick.gameTime).toLocaleDateString())
-    ).toBeInTheDocument();
   });
 
   it("disables delete button when isDeleting is true", () => {

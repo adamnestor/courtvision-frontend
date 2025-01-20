@@ -10,7 +10,29 @@ export interface StatsRow {
   confidenceScore: number;
   gamesPlayed: number;
   average: number;
-  isHighConfidence: boolean;
+  isHighConfidence?: boolean;
+}
+
+export namespace Stats {
+  export interface StatsRow {
+    playerId: number;
+    playerName: string;
+    team: string;
+    opponent: string;
+    statLine: string;
+    hitRate: number;
+    confidenceScore: number;
+    gamesPlayed: number;
+    average: number;
+    isHighConfidence?: boolean;
+  }
+
+  export interface DashboardSummary {
+    availablePicks: number;
+    highConfidencePicks: number;
+    gamesCount: number;
+    averageHitRate: number;
+  }
 }
 
 export interface PlayerStats {
@@ -36,11 +58,4 @@ export interface StatsPick {
   confidenceScore: number;
   result: boolean | null;
   createdAt: string;
-}
-
-export interface DashboardSummary {
-  availablePicks: number;
-  highConfidencePicks: number;
-  gamesCount: number;
-  averageHitRate: number;
 }

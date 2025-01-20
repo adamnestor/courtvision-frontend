@@ -1,7 +1,7 @@
-import { Stats } from "../../../types/stats";
+import type { StatsRow } from "../../../types/stats";
 
 interface StatsTableProps {
-  data: Stats.StatsRow[];
+  data: StatsRow[];
   onRowClick: (playerId: number) => void;
 }
 
@@ -47,6 +47,11 @@ export const StatsTable = ({ data, onRowClick }: StatsTableProps) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{row.gamesPlayed}</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-900">
+                  {row.average.toFixed(1)}
+                </div>
               </td>
             </tr>
           ))}

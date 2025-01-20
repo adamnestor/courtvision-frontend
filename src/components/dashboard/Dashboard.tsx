@@ -53,40 +53,6 @@ export const Dashboard = () => {
       stats.reduce((sum, s) => sum + s.hitRate, 0) / stats.length || 0,
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Unable to load dashboard</h2>
-          <p className="text-muted-foreground">
-            {error instanceof Error ? error.message : "Please try again later"}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!stats?.length) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">No stats available</h2>
-          <p className="text-muted-foreground">
-            Check back later for updated statistics
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   if (!user) return <div>Loading...</div>;
 
   return (
@@ -104,7 +70,21 @@ export const Dashboard = () => {
         onThresholdChange={setThreshold}
         availableCategories={["ALL", "POINTS", "ASSISTS", "REBOUNDS"]}
       />
-      <StatsTable data={stats || []} onRowClick={handleRowClick} />
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <LoadingSpinner />
+        </div>
+      ) : error ? (
+        <div className="text-center py-8 text-destructive">
+          {error instanceof Error ? error.message : "Failed to load stats"}
+        </div>
+      ) : !stats?.length ? (
+        <div className="text-center py-8 text-muted-foreground">
+          No stats available
+        </div>
+      ) : (
+        <StatsTable data={stats} onRowClick={handleRowClick} />
+      )}
     </div>
   );
 };
