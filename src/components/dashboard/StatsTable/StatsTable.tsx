@@ -1,22 +1,16 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { StatsRow } from "../../../types/dashboard";
 
 interface StatsTableProps {
-  stats: {
-    playerId: string;
-    playerName: string;
-    team: string;
-    hitRate: number;
-    confidenceScore: number;
-    gamesPlayed: number;
-    average: number;
-    isHighConfidence: boolean;
-  }[];
-  handleRowClick: (playerId: string) => void;
+  stats: StatsRow[];
+  isLoading: boolean;
+  handleRowClick?: (playerId: string) => void;
 }
 
 export const StatsTable: React.FC<StatsTableProps> = ({
   stats,
+  isLoading,
   handleRowClick,
 }) => {
   return (
@@ -41,7 +35,7 @@ export const StatsTable: React.FC<StatsTableProps> = ({
                 "hover:bg-muted cursor-pointer",
                 stat.isHighConfidence && "bg-success/10"
               )}
-              onClick={() => handleRowClick(stat.playerId)}
+              onClick={() => handleRowClick && handleRowClick(stat.playerId)}
             >
               <td>{stat.playerName}</td>
               <td>{stat.team}</td>

@@ -54,29 +54,29 @@ export const AdminDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <StatCard title="User Management" Icon={Users}>
               <p className="text-muted-foreground">
-                Total Users: {stats?.data.totalUsers || 0}
+                Total Users: {stats?.data?.totalUsers ?? 0}
               </p>
               <p className="text-muted-foreground">
-                Active Users: {stats?.data.activeUsers || 0}
+                Active Users: {stats?.data?.activeUsers ?? 0}
               </p>
             </StatCard>
 
             <StatCard title="System Status" Icon={Activity}>
               <p className="text-muted-foreground">
-                API Status: {stats?.data.systemHealth.apiStatus || "Unknown"}
+                API Status: {stats?.data?.systemHealth.apiStatus ?? "Unknown"}
               </p>
               <p className="text-muted-foreground">
-                Last Check: {stats?.data.systemHealth.lastCheck || "Never"}
+                Last Check: {stats?.data?.systemHealth.lastCheck ?? "Never"}
               </p>
             </StatCard>
 
             <StatCard title="System Configuration" Icon={Settings}>
               <p className="text-muted-foreground">
                 Average Response Time:{" "}
-                {stats?.data.performanceMetrics.averageResponseTime || 0}ms
+                {stats?.data?.performanceMetrics.averageResponseTime ?? 0}ms
               </p>
               <p className="text-muted-foreground">
-                Uptime: {stats?.data.performanceMetrics.uptime || 0}%
+                Uptime: {stats?.data?.performanceMetrics.uptime ?? 0}%
               </p>
             </StatCard>
 

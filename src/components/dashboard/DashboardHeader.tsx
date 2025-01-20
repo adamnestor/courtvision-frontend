@@ -7,15 +7,17 @@ import { StatsRow } from "../../types/dashboard";
 import { calculateDashboardStats } from "../../utils/stats-utils";
 
 interface DashboardHeaderProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   actions?: React.ReactNode;
+  stats: StatsRow[];
 }
 
 export const DashboardHeader = ({
   title,
   subtitle,
   actions,
+  stats,
 }: DashboardHeaderProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
