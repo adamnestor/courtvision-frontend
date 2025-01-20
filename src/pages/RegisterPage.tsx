@@ -1,27 +1,42 @@
+import { useState } from "react";
+import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { AuthForm } from "../components/auth/AuthForm";
 import { AuthLayout } from "../components/auth/AuthLayout";
-import { useAuth } from "../hooks/useAuth";
 
-export const RegisterPage = () => {
+interface RegisterFormData {
+  email: string;
+  password: string;
+}
+
+export function RegisterPage() {
   const navigate = useNavigate();
-  const { register, isLoading, error } = useAuth();
+  const { register } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
-  const handleRegister = async (data: { email: string; password: string }) => {
-    const success = await register(data.email, data.password);
-    if (success) {
-      navigate("/login");
+  const handleSubmit = async (data: RegisterFormData) => {
+    try {
+      setIsLoading(true);
+      setError(undefined);
+      await register(data.email, data.password);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <AuthLayout title="Create Account">
+      {error && <div className="text-red-500">{error}</div>}
       <AuthForm
         type="register"
-        onSubmit={handleRegister}
+        onSubmit={handleSubmit}
         isLoading={isLoading}
         error={error}
       />
     </AuthLayout>
   );
-};
+}

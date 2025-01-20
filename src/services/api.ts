@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, CreateAxiosDefaults } from "axios";
 import { authService } from "./authService";
 import {
   ApiResponse,
@@ -9,20 +9,16 @@ import {
 import { isApiResponse, isPickResponse } from "../utils/type-guards";
 import { toast } from "react-hot-toast";
 
-export const api = axios.create({
+const config: CreateAxiosDefaults = {
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
-  timeout: 10000, // 10 seconds timeout
-  raxConfig: {
-    retry: 3,
-    retryDelay: 3000,
-    statusCodesToRetry: [[408, 429, 500, 502, 503, 504]],
-  },
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest",
   },
-});
+  withCredentials: true,
+};
+
+const api = axios.create(config);
 
 export class ApiError extends Error {
   constructor(
@@ -141,4 +137,15 @@ export const deleteParlay = async (id: string): Promise<ApiResponse<void>> => {
   return response.data;
 };
 
-export default api;
+// Type guard for error response
+function isErrorResponse(error: unknown): error is ErrorResponse {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as ErrorResponse).message === "string"
+  );
+}
+
+export { api };
+export type { ApiResponse };

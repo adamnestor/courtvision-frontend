@@ -4,16 +4,19 @@ import {
   validateParlay,
   calculateParlayOdds,
   isValidThreshold,
+  validatePickRequest,
+  CreatePickRequest,
+  ValidCategory,
 } from "./pick-validation";
-import { CreatePickRequest, Category } from "../types/picks";
 
 describe("pick-validation", () => {
   const validPick: CreatePickRequest = {
     playerId: 1,
-    category: "POINTS" as Category,
+    category: "POINTS" as ValidCategory,
     threshold: 20,
     gameId: "game123",
     hitRateAtPick: 65.5,
+    isParlay: false,
   };
 
   describe("validatePick", () => {
@@ -32,10 +35,26 @@ describe("pick-validation", () => {
 
     it("validates category-specific thresholds", () => {
       const picks = [
-        { ...validPick, category: "POINTS" as Category, threshold: 50 }, // Valid
-        { ...validPick, category: "ASSISTS" as Category, threshold: 15 }, // Valid
-        { ...validPick, category: "POINTS" as Category, threshold: 100 }, // Invalid
-        { ...validPick, category: "ASSISTS" as Category, threshold: 25 }, // Invalid
+        {
+          ...validPick,
+          category: "POINTS" as ValidCategory,
+          threshold: 50,
+        }, // Valid
+        {
+          ...validPick,
+          category: "ASSISTS" as ValidCategory,
+          threshold: 15,
+        }, // Valid
+        {
+          ...validPick,
+          category: "POINTS" as ValidCategory,
+          threshold: 100,
+        }, // Invalid
+        {
+          ...validPick,
+          category: "ASSISTS" as ValidCategory,
+          threshold: 25,
+        }, // Invalid
       ];
 
       expect(validatePick(picks[0]).isValid).toBe(true);
@@ -56,7 +75,7 @@ describe("pick-validation", () => {
     it("validates a valid parlay", () => {
       const parlay = [
         validPick,
-        { ...validPick, playerId: 2, category: "ASSISTS" as Category },
+        { ...validPick, playerId: 2, category: "ASSISTS" as ValidCategory },
       ];
       const result = validateParlay(parlay);
       expect(result.isValid).toBe(true);
@@ -66,7 +85,7 @@ describe("pick-validation", () => {
     it("rejects parlays with duplicate players", () => {
       const parlay = [
         validPick,
-        { ...validPick, category: "ASSISTS" as Category },
+        { ...validPick, category: "ASSISTS" as ValidCategory },
       ];
       const result = validateParlay(parlay);
       expect(result.isValid).toBe(false);
@@ -124,7 +143,22 @@ describe("pick-validation", () => {
     });
 
     it("handles invalid categories", () => {
-      expect(isValidThreshold("INVALID" as Category, 10)).toBe(false);
+      expect(isValidThreshold("INVALID" as ValidCategory, 10)).toBe(false);
     });
+  });
+
+  describe("validatePickRequest", () => {
+    it("validates a valid pick request", () => {
+      const validRequest: CreatePickRequest = {
+        playerId: 1,
+        category: "POINTS" as ValidCategory,
+        threshold: 20,
+        hitRateAtPick: 75,
+        isParlay: false,
+      };
+      expect(validatePickRequest(validRequest)).toBe(true);
+    });
+
+    // Add more test cases...
   });
 });

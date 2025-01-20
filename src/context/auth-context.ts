@@ -9,16 +9,18 @@ interface AuthContextType {
   } | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: () => void;
+  login: () => Promise<void>;
   logout: () => void;
+  register: (email: string, password: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isAdmin: false,
-  login: () => {},
+  login: () => Promise.resolve(),
   logout: () => {},
+  register: () => Promise.resolve(),
 });
 
 export const useAuth = () => {

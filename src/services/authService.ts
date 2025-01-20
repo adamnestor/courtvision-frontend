@@ -14,6 +14,12 @@ interface RegisterRequest {
   confirmPassword: string;
 }
 
+export interface User {
+  token: string;
+  email: string;
+  role: "USER" | "ADMIN";
+}
+
 interface AuthResponse {
   token: string;
   email: string;
@@ -33,7 +39,7 @@ export const authService = {
       },
     });
     if (response.data.token) {
-      secureStorage.set("user", response.data);
+      secureStorage.setItem("user", response.data);
     }
     return response.data;
   },
@@ -48,7 +54,7 @@ export const authService = {
   },
 
   getCurrentUser(): AuthResponse | null {
-    const user = secureStorage.get("user");
+    const user = secureStorage.getItem<AuthResponse>("user");
     if (user?.token && isTokenExpired(user.token)) {
       this.logout();
       return null;
@@ -77,7 +83,7 @@ export const authService = {
     );
 
     if (response.data.token) {
-      secureStorage.set("user", response.data);
+      secureStorage.setItem("user", response.data);
     }
     return response.data;
   },

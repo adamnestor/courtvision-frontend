@@ -1,5 +1,5 @@
 // services/picksService.ts
-import api from "./api";
+import { api } from "./api";
 import { ApiResponse } from "../types/api";
 import { UserPickDTO, Parlay } from "../types/picks";
 

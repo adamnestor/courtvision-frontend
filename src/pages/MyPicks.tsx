@@ -1,54 +1,37 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserPicks, deletePick } from "../services/api";
+import { usePicks } from "../hooks/usePicks";
 import { PickCard } from "../components/picks/PickCard";
-import { PicksFilter } from "../components/picks/PicksFilter";
-import { LoadingState } from "../components/common/LoadingState";
+import { UserPickDTO } from "../types/picks";
 
-const MyPicks = () => {
-  const [activeFilter, setActiveFilter] = useState("all");
-  const queryClient = useQueryClient();
+export function MyPicks() {
+  const { singles, deletePick, isLoading } = usePicks();
 
-  const { data: picks, isLoading } = useQuery({
-    queryKey: ["picks"],
-    queryFn: getUserPicks,
-  });
+  const renderPicks = () => {
+    if (!singles || singles.length === 0) {
+      return <div>No picks found</div>;
+    }
 
-  const deleteMutation = useMutation({
-    mutationFn: deletePick,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["picks"] });
-    },
-  });
-
-  if (isLoading) return <LoadingState message="Loading picks..." />;
-
-  const filteredPicks = picks?.data.filter((pick) => {
-    if (activeFilter === "active") return !pick.result;
-    if (activeFilter === "completed") return pick.result;
-    return true;
-  });
+    return singles.map((pick: UserPickDTO) => (
+      <PickCard
+        key={pick.id}
+        pick={{
+          ...pick,
+          hitRate: pick.hitRateAtPick,
+          gameTime: pick.createdAt,
+          confidenceScore: pick.confidenceScore ?? 0,
+          result: pick.result ? "WIN" : pick.result === false ? "LOSS" : null,
+        }}
+        onDelete={() => deletePick(pick.id)}
+        isDeleting={isLoading}
+      />
+    ));
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">My Picks</h1>
-
-      <PicksFilter
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-      />
-
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredPicks?.map((pick) => (
-          <PickCard
-            key={pick.id}
-            pick={pick}
-            onDelete={() => deleteMutation.mutate(pick.id)}
-          />
-        ))}
+        {renderPicks()}
       </div>
     </div>
   );
-};
-
-export default MyPicks;
+}

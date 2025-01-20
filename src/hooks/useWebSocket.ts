@@ -1,11 +1,17 @@
 import { create } from "zustand";
 
+interface WebSocketMessage {
+  type: string;
+  payload: Record<string, unknown>;
+  timestamp: string;
+}
+
 interface WebSocketState {
   connected: boolean;
-  messages: any[];
+  messages: WebSocketMessage[];
   connect: () => void;
   disconnect: () => void;
-  sendMessage: (message: any) => void;
+  sendMessage: (message: WebSocketMessage) => void;
 }
 
 export const useWebSocket = create<WebSocketState>((set) => ({

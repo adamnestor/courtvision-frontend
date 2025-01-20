@@ -1,27 +1,37 @@
+import { useState } from "react";
+import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { AuthForm } from "../components/auth/AuthForm";
 import { AuthLayout } from "../components/auth/AuthLayout";
-import { useAuth } from "../hooks/useAuth";
 
-export const LoginPage = () => {
+export function LoginPage() {
   const navigate = useNavigate();
-  const { login, isLoading, error } = useAuth();
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
 
-  const handleLogin = async (data: { email: string; password: string }) => {
-    const success = await login(data.email, data.password);
-    if (success) {
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      setError(undefined);
+      await login();
       navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <AuthLayout title="Welcome Back">
+      {error && <div className="text-red-500">{error}</div>}
       <AuthForm
         type="login"
-        onSubmit={handleLogin}
+        onSubmit={handleSubmit}
         isLoading={isLoading}
         error={error}
       />
     </AuthLayout>
   );
-};
+}

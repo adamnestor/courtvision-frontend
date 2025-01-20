@@ -1,33 +1,42 @@
 import { useParams } from "react-router-dom";
+import { usePlayerDetails } from "../hooks/usePlayerDetails";
+import { PlayerDetailHeader } from "../components/player/PlayerDetailHeader";
 import { PlayerStats } from "../components/player/PlayerStats";
 import { PlayerHistory } from "../components/player/PlayerHistory";
-import { PlayerActions } from "../components/player/PlayerActions";
-import { usePlayerDetails } from "../hooks/usePlayerDetails";
-import { LoadingState } from "../components/common/LoadingState";
+import { LoadingSpinner } from "../components/shared/LoadingSpinner";
+import { GameResult } from "../types/player";
 
-export const PlayerDetail = () => {
+export function PlayerDetail() {
   const { playerId } = useParams();
-  const { data: player, isLoading, createPick } = usePlayerDetails(playerId);
+  const { data, isLoading } = usePlayerDetails({
+    playerId: playerId ? parseInt(playerId, 10) : 0,
+  });
 
-  if (isLoading || !player) {
-    return <LoadingState message="Loading player details..." />;
-  }
+  if (isLoading || !data) return <LoadingSpinner />;
+
+  const gameResults: GameResult[] = data.games.map((game) => ({
+    id: game.gameId,
+    date: game.gameDate,
+    opponent: game.opponent,
+    statValue: game.selectedStatValue,
+    hitThreshold: game.metThreshold,
+  }));
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">{player.name}</h1>
+      <h1 className="text-2xl font-bold mb-6">{`${data.player.firstName} ${data.player.lastName}`}</h1>
 
-      <div className="space-y-6">
-        <PlayerStats stats={player.stats} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
-            <PlayerHistory games={player.recentGames} />
-          </div>
-          <div>
-            <PlayerActions onCreatePick={createPick} isLoading={isLoading} />
-          </div>
-        </div>
-      </div>
+      <PlayerDetailHeader stats={data} />
+
+      <PlayerStats
+        stats={{
+          hitRate: data.summary.hitRate,
+          average: data.summary.average,
+          gamesPlayed: data.metrics.totalGames,
+        }}
+      />
+
+      <PlayerHistory games={gameResults} />
     </div>
   );
-};
+}

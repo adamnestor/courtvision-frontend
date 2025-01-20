@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useThemeContext } from "../context/ThemeProvider";
+import { useThemeContext } from "../context/theme-context";
 
 export function useThemePersistence() {
   const { theme } = useThemeContext();

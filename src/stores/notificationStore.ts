@@ -1,5 +1,14 @@
 import { create } from "zustand";
-import { Notification } from "../types/notifications";
+
+interface Notification {
+  id: string;
+  timestamp: number;
+  message: string;
+  title: string;
+  type: "success" | "error" | "info" | "warning";
+  autoClose?: boolean;
+  duration?: number;
+}
 
 interface NotificationState {
   notifications: Notification[];
@@ -18,7 +27,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
         {
           ...notification,
           id: crypto.randomUUID(),
-          timestamp: new Date().toISOString(),
+          timestamp: Date.now(),
         },
       ],
     })),

@@ -1,25 +1,29 @@
-import { useEffect } from "react";
-import { useAuth } from "./useAuth";
+import { useEffect, useRef } from "react";
+import { useAuth } from "../context/auth-context";
 
-export const useSessionTimeout = (timeoutMinutes = 30) => {
+export function useSessionTimeout(timeoutInMinutes = 30) {
   const { logout } = useAuth();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
     const resetTimeout = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(logout, timeoutMinutes * 60 * 1000);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(logout, timeoutInMinutes * 60 * 1000);
     };
 
     window.addEventListener("mousemove", resetTimeout);
     window.addEventListener("keypress", resetTimeout);
+
     resetTimeout();
 
     return () => {
-      clearTimeout(timeoutId);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       window.removeEventListener("mousemove", resetTimeout);
       window.removeEventListener("keypress", resetTimeout);
     };
-  }, [logout, timeoutMinutes]);
-};
+  }, [logout, timeoutInMinutes]);
+}

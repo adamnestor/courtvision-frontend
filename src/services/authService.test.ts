@@ -4,7 +4,7 @@ import { authService } from "./authService";
 
 // Mock axios
 vi.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = vi.mocked(axios, true);
 
 describe("authService", () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { Category, TimePeriod } from "./dashboard";
+import { TimePeriod, Category as DashboardCategory } from "./dashboard";
 
 export interface PlayerInfo {
   playerId: number;
@@ -31,7 +31,7 @@ export interface GameMetrics {
 }
 
 export interface StatsSummary {
-  category: Category;
+  category: DashboardCategory;
   threshold: number;
   timePeriod: TimePeriod;
   hitRate: number;

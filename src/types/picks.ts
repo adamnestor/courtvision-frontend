@@ -7,6 +7,7 @@ export interface UserPickDTO {
   category: string;
   threshold: number;
   hitRateAtPick: number;
+  confidenceScore: number;
   result?: boolean;
   createdAt: string;
 }

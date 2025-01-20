@@ -1,31 +1,24 @@
-import { create } from "zustand";
+import { useEffect } from "react";
+import { io, Socket } from "socket.io-client";
 
-interface RealtimeState {
-  connected: boolean;
-  lastUpdate: Date | null;
-  updates: {
-    [key: string]: {
-      data: any;
-      timestamp: number;
-    };
-  };
-  setConnected: (status: boolean) => void;
-  addUpdate: (key: string, data: any) => void;
-  clearUpdates: () => void;
+interface UpdateData {
+  type: string;
+  data: Record<string, unknown>;
+  timestamp: string;
 }
 
-export const useRealtimeUpdates = create<RealtimeState>((set) => ({
-  connected: false,
-  lastUpdate: null,
-  updates: {},
-  setConnected: (status) => set({ connected: status }),
-  addUpdate: (key, data) =>
-    set((state) => ({
-      updates: {
-        ...state.updates,
-        [key]: { data, timestamp: Date.now() },
-      },
-      lastUpdate: new Date(),
-    })),
-  clearUpdates: () => set({ updates: {} }),
-}));
+export function useRealtimeUpdates(
+  endpoint: string,
+  onUpdate: (data: UpdateData) => void
+) {
+  useEffect(() => {
+    const socket: Socket = io(endpoint);
+
+    socket.on("update", onUpdate);
+
+    return () => {
+      socket.off("update", onUpdate);
+      socket.disconnect();
+    };
+  }, [endpoint, onUpdate]);
+}

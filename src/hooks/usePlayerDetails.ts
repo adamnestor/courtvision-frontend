@@ -1,47 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { createSinglePick } from "../services/api";
-import { toast } from "react-hot-toast";
-import { PickCategory } from "../types/parlay";
-import { usePlayerStats } from "./usePlayerStats";
+import { useQuery } from "@tanstack/react-query";
+import { Category, TimePeriod } from "../types/dashboard";
+import { PlayerDetailStats } from "../types/player";
+import { api } from "../services/api";
 
-export function usePlayerDetails(
-  playerId: number,
-  timePeriod: string,
-  category: string,
-  threshold: number
-) {
-  const queryClient = useQueryClient();
-  const { data: stats, isLoading } = usePlayerStats(
-    playerId,
-    timePeriod,
-    category,
-    threshold
-  );
+interface UsePlayerDetailsProps {
+  playerId: number;
+  category?: Category;
+  timePeriod?: TimePeriod;
+}
 
-  const createPickMutation = useMutation({
-    mutationFn: (pickData: {
-      category: PickCategory;
-      threshold: number;
-      hitRateAtPick: number;
-    }) =>
-      createSinglePick({
-        playerId,
-        ...pickData,
-        isParlay: false,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["picks"] });
-      toast.success("Pick saved successfully!");
-    },
-    onError: () => {
-      toast.error("Failed to save pick");
+export function usePlayerDetails({
+  playerId,
+  category = "POINTS",
+  timePeriod = "L10",
+}: UsePlayerDetailsProps) {
+  return useQuery<PlayerDetailStats>({
+    queryKey: ["playerDetails", playerId, category, timePeriod],
+    queryFn: async () => {
+      const response = await api.get(`/players/${playerId}/details`, {
+        params: { category, timePeriod },
+      });
+      return response.data;
     },
   });
-
-  return {
-    stats,
-    isLoading,
-    createPick: createPickMutation.mutate,
-    isCreating: createPickMutation.isPending,
-  };
 }

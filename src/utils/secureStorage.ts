@@ -1,23 +1,19 @@
 export const secureStorage = {
-  set(key: string, value: any): void {
+  setItem<T>(key: string, value: T): void {
     try {
       const serializedValue = JSON.stringify(value);
-      const encodedValue = btoa(serializedValue); // Basic encoding
-      localStorage.setItem(key, encodedValue);
-    } catch (error) {
-      console.error("Error storing data");
-      throw new Error("Failed to store data securely");
+      localStorage.setItem(key, serializedValue);
+    } catch {
+      console.error(`Failed to store item with key: ${key}`);
     }
   },
 
-  get(key: string): any {
+  getItem<T>(key: string): T | null {
     try {
-      const encodedValue = localStorage.getItem(key);
-      if (!encodedValue) return null;
-      const serializedValue = atob(encodedValue); // Basic decoding
-      return JSON.parse(serializedValue);
-    } catch (error) {
-      console.error("Error retrieving data");
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    } catch {
+      console.error(`Failed to retrieve item with key: ${key}`);
       return null;
     }
   },
