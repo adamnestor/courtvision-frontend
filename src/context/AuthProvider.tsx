@@ -1,16 +1,16 @@
 import { ReactNode } from "react";
-import { useAuthStore } from "../hooks/useAuthStore";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./auth-context";
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isAuthenticated, isLoading, setUser, logout } = useAuthStore();
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const value = {
-    user,
-    isAuthenticated,
-    isLoading,
-    login: setUser,
-    logout,
+    isAuthenticated: false,
+    isAdmin: false,
+    login: () => {}, // Empty implementation for now
+    logout: () => {},
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
